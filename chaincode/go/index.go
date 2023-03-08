@@ -97,6 +97,16 @@ func (t *VotingChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return t.createVoter(stub, args)
 	} else if function == "createCandidate" {
 		return t.createCandidate(stub, args)
+	} else if function == "getVoteCount" {
+		return t.getVoteCount(stub, args)
+	} else if function == "getElectionById" {
+		return t.getElectionById(stub, args)
+	} else if function == "getAllElections" {
+		return t.getAllElections(stub)
+	} else if function == "getCandidatesById" {
+		return t.getCandidatesById(stub, args)
+	} else if function == "queryByRange" {
+		return t.queryByRange(stub, args)
 	}
 	fmt.Println("invoke did not find func: " + function) //error
 	return shim.Error("Received unknown function invocation")
