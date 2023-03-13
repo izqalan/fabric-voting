@@ -1,0 +1,38 @@
+basePath: /api/v1
+host: localhost:8081
+info:
+  contact:
+    email: izqalan@duck.com
+    name: Izqalan Nor'Izad
+    url: https://github.com/izqalan
+  description: A Voting DLT service API in Go using Gin framework.
+  title: Fabric Voting API
+  version: "1.0"
+paths:
+  /hello:
+    get:
+      description: Returns hello world
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: hello world
+          schema:
+            type: string
+      summary: Hello World
+      tags:
+      - Signal
+  /ping:
+    get:
+      description: Returns pong
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: pong
+          schema:
+            type: string
+      summary: Ping Pong
+      tags:
+      - Signal
+swagger: "2.0"

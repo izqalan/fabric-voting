@@ -1,0 +1,57 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "A Voting DLT service API in Go using Gin framework.",
+        "title": "Fabric Voting API",
+        "contact": {
+            "name": "Izqalan Nor'Izad",
+            "url": "https://github.com/izqalan",
+            "email": "izqalan@duck.com"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8081",
+    "basePath": "/api/v1",
+    "paths": {
+        "/hello": {
+            "get": {
+                "description": "Returns hello world",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Signal"
+                ],
+                "summary": "Hello World",
+                "responses": {
+                    "200": {
+                        "description": "hello world",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ping": {
+            "get": {
+                "description": "Returns pong",
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Signal"
+                ],
+                "summary": "Ping Pong",
+                "responses": {
+                    "200": {
+                        "description": "pong",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

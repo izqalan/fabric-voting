@@ -1,20 +1,25 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"net/http"
+	_ "github.com/izqalan/fabric-voting/app/docs"
+	r "github.com/izqalan/fabric-voting/app/routes"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func testFunction(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World")
-}
+// @title     Fabric Voting API
+// @version         1.0
+// @description     A Voting DLT service API in Go using Gin framework.
 
-func handleRequests() {
-	http.HandleFunc("/", testFunction)
-	log.Fatal(http.ListenAndServe(":5000", nil))
-}
+// @contact.name   Izqalan Nor'Izad
+// @contact.url    https://github.com/izqalan
+// @contact.email  izqalan@duck.com
+
+// @host      localhost:8081
+// @BasePath  /api/v1
 
 func main() {
-	handleRequests()
+	r := r.SetupRouter()
+	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.Run(":8081")
 }
