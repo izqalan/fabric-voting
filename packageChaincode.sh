@@ -31,3 +31,5 @@ export CORE_PEER_MSPCONFIGPATH=${PROJECT_TEST_NETWORK}/organizations/peerOrganiz
 export CORE_PEER_ADDRESS=localhost:9051
 
 peer lifecycle chaincode install basic_$version.tar.gz
+
+peer lifecycle chaincode queryinstalled
