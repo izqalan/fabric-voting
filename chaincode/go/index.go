@@ -32,10 +32,11 @@ type voter struct {
 }
 
 type election struct {
-	ElectionID   string `json:"electionID"`
-	ElectionName string `json:"electionName"`
-	StartDate    string `json:"startDate"`
-	EndDate      string `json:"endDate"`
+	ElectionID   string    `json:"electionID"`
+	ElectionName string    `json:"electionName"`
+	StartDate    string    `json:"startDate"`
+	EndDate      string    `json:"endDate"`
+	CreatedAt    string `json:"createdAt"`
 }
 
 type electionResults struct {
@@ -282,24 +283,28 @@ func (t *VotingChaincode) getAllElections(stub shim.ChaincodeStubInterface) pb.R
 
 // create election function
 func (t *VotingChaincode) createElection(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 4 {
+	if len(args) != 3 {
 		return shim.Error("Incorrect number of arguments. Expecting 3")
 	}
 	electionName := args[0]
 	startDate := args[1]
 	endDate := args[2]
-	electionID := args[3]
+	// Id is optional
+	// id specify the election id
+	// it must start with "election."
+	// electionID := args[3]
+
+	// check if election name is provided
+
+	electionID := "election." + strconv.Itoa(time.Now().Nanosecond())
+	createdAt := time.Now().String()
 
 	if startDate > endDate {
 		return shim.Error("Invalid election dates")
 	}
 
-	// if election id is not provided, generate one
-	if electionID == "" {
-		electionID = "election." + strconv.Itoa(time.Now().Nanosecond())
-	}
 	// generate unique election id
-	var election = &election{electionID, electionName, startDate, endDate}
+	var election = &election{electionID, electionName, startDate, endDate, createdAt}
 	electionAsBytes, _ := json.Marshal(election)
 	err := stub.PutState(electionID, electionAsBytes)
 	if err != nil {
