@@ -9,6 +9,57 @@ info:
   title: Fabric Voting API
   version: "1.0"
 paths:
+  /candidate:
+    post:
+      consumes:
+      - application/json
+      description: Create a new candidate
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Candidate created
+          schema:
+            type: string
+      summary: Create Candidate
+      tags:
+      - Candidate
+  /election:
+    post:
+      consumes:
+      - application/json
+      description: Create a new election
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Election created
+          schema:
+            type: string
+      summary: Create Election
+      tags:
+      - Election
+  /election/{electionID}:
+    get:
+      consumes:
+      - application/json
+      description: Get election by electionID
+      parameters:
+      - description: Election ID
+        in: path
+        name: electionID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Election created
+          schema:
+            type: string
+      summary: Get Election
+      tags:
+      - Election
   /hello:
     get:
       description: Returns hello world

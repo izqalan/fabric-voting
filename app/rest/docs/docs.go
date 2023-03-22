@@ -19,6 +19,84 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/candidate": {
+            "post": {
+                "description": "Create a new candidate",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Create Candidate",
+                "responses": {
+                    "200": {
+                        "description": "Candidate created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/election": {
+            "post": {
+                "description": "Create a new election",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Election"
+                ],
+                "summary": "Create Election",
+                "responses": {
+                    "200": {
+                        "description": "Election created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/election/{electionID}": {
+            "get": {
+                "description": "Get election by electionID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Election"
+                ],
+                "summary": "Get Election",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Election ID",
+                        "name": "electionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Election created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/hello": {
             "get": {
                 "description": "Returns hello world",
