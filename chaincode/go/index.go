@@ -32,10 +32,10 @@ type voter struct {
 }
 
 type election struct {
-	ElectionID   string    `json:"electionID"`
-	ElectionName string    `json:"electionName"`
-	StartDate    string    `json:"startDate"`
-	EndDate      string    `json:"endDate"`
+	ElectionID   string `json:"electionID"`
+	ElectionName string `json:"electionName"`
+	StartDate    string `json:"startDate"`
+	EndDate      string `json:"endDate"`
 	CreatedAt    string `json:"createdAt"`
 }
 
@@ -343,14 +343,42 @@ func (t *VotingChaincode) getCandidatesById(stub shim.ChaincodeStubInterface, ar
 		return shim.Error("Incorrect number of arguments. Expecting 1")
 	}
 	electionId := args[0]
-	candidates := []candidate{}
-	candidatesAsBytes, err := stub.GetState(electionId)
+
+	// get candidates for election by id
+	// electionid is stored in the candidate object
+	// so you need to get all candidateId keys and get the candidate object
+	// that match the electionId
+	studentIdsAsBytes, err := stub.GetStateByRange("candidate.", "candidate.z")
 	if err != nil {
-		return shim.Error("Failed to get candidates: " + electionId)
+		return shim.Error("Failed to get candidate: " + electionId)
 	}
-	json.Unmarshal(candidatesAsBytes, &candidates)
-	candidatesAsBytes, _ = json.Marshal(candidates)
-	return shim.Success(candidatesAsBytes)
+	defer studentIdsAsBytes.Close()
+	// buffer is a JSON array containing QueryResults
+	var buffer bytes.Buffer
+	buffer.WriteString("[")
+	bArrayMemberAlreadyWritten := false
+	for studentIdsAsBytes.HasNext() {
+		queryResponse, err := studentIdsAsBytes.Next()
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		// Add a comma before array members, suppress it for the first array member
+		if bArrayMemberAlreadyWritten == true {
+			buffer.WriteString(",")
+		}
+		candidateAsBytes, err := stub.GetState(queryResponse.Key)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		candidate := candidate{}
+		json.Unmarshal(candidateAsBytes, &candidate)
+		if candidate.ElectionID == electionId {
+			buffer.WriteString(string(candidateAsBytes))
+			bArrayMemberAlreadyWritten = true
+		}
+	}
+	buffer.WriteString("]")
+	return shim.Success(buffer.Bytes())
 }
 
 // query by range function
