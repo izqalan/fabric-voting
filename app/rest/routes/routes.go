@@ -30,11 +30,17 @@ func SetupRouter(contract *client.Contract) *gin.Engine {
 		v1.POST("/candidate", func(c *gin.Context) {
 			createCandidate(contract, c)
 		})
+		v1.GET("/candidate/:electionID", func(c *gin.Context) {
+			getCandidatesByElectionId(contract, c)
+		})
 		v1.POST("/election", func(c *gin.Context) {
 			createElection(contract, c)
 		})
 		v1.GET("/election/:electionID", func(c *gin.Context) {
 			getElectionById(contract, c)
+		})
+		v1.GET("/election", func(c *gin.Context) {
+			getAllElections(contract, c)
 		})
 	}
 	return r
@@ -94,6 +100,32 @@ func createCandidate(contract *client.Contract, c *gin.Context) {
 	})
 }
 
+// @Summary Get Candidate
+// @Description Get candidate by electionID
+// @Tags Candidate
+// @Accept  json
+// @Produce  json
+// @Param electionID path string true "Election ID"
+// @Success 200 {string} string "Candidates fetched"
+// @Router /candidate/{electionID} [get]
+func getCandidatesByElectionId(contract *client.Contract, c *gin.Context) {
+	electionID := c.Param("electionID")
+	result, err := contract.EvaluateTransaction("getCandidatesById", electionID)
+	if err != nil {
+		panic(fmt.Errorf("failed to evaluate transaction: %w", err))
+	}
+
+	fmt.Printf("*** Transaction result: %s\n", string(result))
+
+	r := string(result)
+	// out, _ := json.Marshal(string(r))
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Candidate fetched successfully.",
+		"data":    r,
+	})
+}
+
 // @Summary Create Election
 // @Description Create a new election
 // @Tags Election
@@ -122,7 +154,7 @@ func createElection(contract *client.Contract, c *gin.Context) {
 	})
 }
 
-// @Summary Get Election
+// @Summary Get Election by id
 // @Description Get election by electionID
 // @Tags Election
 // @Accept  json
@@ -146,4 +178,29 @@ func getElectionById(contract *client.Contract, c *gin.Context) {
 		"message": "Election fetched successfully.",
 		"data":    r,
 	})
+}
+
+// @Summary Get All Elections
+// @Description Get all elections
+// @Tags Election
+// @Accept  json
+// @Produce  json
+// @Success 200 {json}
+// @Router /election [get]
+func getAllElections(contract *client.Contract, c *gin.Context) {
+	// get all elections using queryByRange function chaincode
+	result, err := contract.EvaluateTransaction("queryByRange", "election.", "election.z")
+	if err != nil {
+		panic(fmt.Errorf("failed to query transaction: %w", err))
+	}
+
+	fmt.Printf("*** Transaction result: %s\n", string(result))
+
+	r := string(result)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Elections fetched successfully.",
+		"data":    r,
+	})
+
 }
