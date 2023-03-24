@@ -31,11 +31,12 @@ type voter struct {
 }
 
 type election struct {
-	ElectionID   string `json:"electionID"`
-	ElectionName string `json:"electionName"`
-	StartDate    string `json:"startDate"`
-	EndDate      string `json:"endDate"`
-	CreatedAt    string `json:"createdAt"`
+	ElectionID   string  `json:"electionID"`
+	ElectionName string  `json:"electionName"`
+	StartDate    string  `json:"startDate"`
+	EndDate      string  `json:"endDate"`
+	CreatedAt    string  `json:"createdAt"`
+	UpdatedAt    *string `json:"updatedAt"`
 }
 
 type electionResults struct {
@@ -103,6 +104,8 @@ func (t *VotingChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return t.getElectionById(stub, args)
 	} else if function == "getAllElections" {
 		return t.getAllElections(stub)
+	} else if function == "updateElection" {
+		return t.updateElection(stub, args)
 	} else if function == "getCandidatesById" {
 		return t.getCandidatesById(stub, args)
 	} else if function == "queryByRange" {
@@ -309,7 +312,7 @@ func (t *VotingChaincode) createElection(stub shim.ChaincodeStubInterface, args 
 	}
 
 	// generate unique election id
-	var election = &election{electionID, electionName, startDate, endDate, createdAt}
+	var election = &election{electionID, electionName, startDate, endDate, createdAt, nil}
 	electionAsBytes, _ := json.Marshal(election)
 	err := stub.PutState(electionID, electionAsBytes)
 	if err != nil {
@@ -339,6 +342,63 @@ func (t *VotingChaincode) createCandidate(stub shim.ChaincodeStubInterface, args
 	}
 
 	fmt.Println("candidate creation successful")
+	return shim.Success(nil)
+}
+
+func (t *VotingChaincode) updateElection(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	// first param electionID
+	electionID := args[0]
+
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1")
+	}
+	var payload struct {
+		ElectionID   string `json:"electionId"`
+		ElectionName string `json:"electionName"`
+		StartDate    string `json:"startDate"`
+		EndDate      string `json:"endDate"`
+		UpdatedAt    string `json:"updatedAt"`
+	}
+
+	err := json.Unmarshal([]byte(args[0]), &payload)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	if electionID == "" {
+		return shim.Error("Election ID is required")
+	}
+
+	// check if election exists
+	electionAsBytes, err := stub.GetState(electionID)
+	if err != nil {
+		return shim.Error("Failed to get election: " + err.Error())
+	} else if electionAsBytes == nil {
+		return shim.Error("Election does not exist")
+	}
+
+	// update election fields
+	election := &election{}
+	err = json.Unmarshal(electionAsBytes, election)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	election.ElectionName = payload.ElectionName
+	election.StartDate = payload.StartDate
+	election.EndDate = payload.EndDate
+	election.UpdatedAt = &payload.UpdatedAt
+
+	// save updated election
+	electionAsBytes, err = json.Marshal(election)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	err = stub.PutState(payload.ElectionID, electionAsBytes)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	fmt.Printf("Election update successful %s", payload.ElectionID)
 	return shim.Success(nil)
 }
 
