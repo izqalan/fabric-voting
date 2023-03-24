@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/hyperledger/fabric-chaincode-go/shim"
@@ -283,21 +282,27 @@ func (t *VotingChaincode) getAllElections(stub shim.ChaincodeStubInterface) pb.R
 
 // create election function
 func (t *VotingChaincode) createElection(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 3 {
+	if len(args) != 5 {
 		return shim.Error("Incorrect number of arguments. Expecting 3")
 	}
 	electionName := args[0]
 	startDate := args[1]
 	endDate := args[2]
-	// Id is optional
-	// id specify the election id
-	// it must start with "election."
-	// electionID := args[3]
+	// electionID is pecified in the REST API server
+	// hence all peers will have the same electionID
+
+	electionID := args[3]
+	createdAt := args[4]
 
 	// check if election name is provided
 
-	electionID := "election." + strconv.Itoa(time.Now().Nanosecond())
-	createdAt := time.Now().String()
+	// creating Id using current time broke the block
+	// when smart contract is issued by REST API not all peers run the contract at the same time
+	// this means peer01 will have a different electionID than peer02
+	// hence endorsement will fail becase of key and value mismatch between peers
+	// to circumvent this issue we need to specify the electionID in the REST API call
+	// electionID := "election." + strconv.Itoa(time.Now().Nanosecond())
+	// createdAt := time.Now().String()
 
 	if startDate > endDate {
 		return shim.Error("Invalid election dates")
