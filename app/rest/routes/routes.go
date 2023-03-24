@@ -21,6 +21,7 @@ type election struct {
 	ElectionName string `json:"electionName"`
 	StartDate    string `json:"startDate"`
 	EndDate      string `json:"endDate"`
+	UpdatedAt    string `json:"updatedAt"`
 }
 
 type voter struct {
@@ -238,6 +239,45 @@ func getAllElections(contract *client.Contract, c *gin.Context) {
 		"data":    response,
 	})
 
+}
+
+// update election
+// @Summary Update Election
+// @Description Update election by electionID
+// @Tags Election
+// @Accept  json
+// @Produce  json
+// @Param electionID path string true "Election ID"
+// @Body  {object} election
+// @Success 200 {string} string "Election updated"
+// @Router /election/{electionID} [put]
+func updateElection(contract *client.Contract, c *gin.Context) {
+	electionID := c.Param("electionID")
+
+	var election election
+	if err := c.ShouldBindJSON(&election); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// the chaincode takes in object of type election
+	// so we need to convert the election object to json
+	// and then pass it to the chaincode
+	electionJSON, err := json.Marshal(election)
+	if err != nil {
+		panic(fmt.Errorf("failed to marshal JSON data: %w", err))
+	}
+
+	_, err = contract.SubmitTransaction("updateElection", electionID, string(electionJSON))
+	if err != nil {
+		panic(fmt.Errorf("failed to submit transaction: %w", err))
+	}
+
+	fmt.Printf("*** Transaction committed successfully\n")
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Election updated. Txn committed successfully.",
+	})
 }
 
 // @Summary Create Voter
