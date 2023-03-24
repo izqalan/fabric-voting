@@ -1,8 +1,10 @@
 package routes
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hyperledger/fabric-gateway/pkg/client"
@@ -19,6 +21,17 @@ type election struct {
 	ElectionName string `json:"electionName"`
 	StartDate    string `json:"startDate"`
 	EndDate      string `json:"endDate"`
+}
+
+type voter struct {
+	StudentID  string `json:"studentID"`
+	ElectionID string `json:"electionID"`
+	Email      string `json:"email"`
+}
+
+type vote struct {
+	VoterID     string `json:"voterID"`
+	CandidateID string `json:"candidateID"`
 }
 
 func SetupRouter(contract *client.Contract) *gin.Engine {
@@ -42,6 +55,13 @@ func SetupRouter(contract *client.Contract) *gin.Engine {
 		v1.GET("/election", func(c *gin.Context) {
 			getAllElections(contract, c)
 		})
+		v1.POST("/voter", func(c *gin.Context) {
+			createVoter(contract, c)
+		})
+		v1.POST("/ballot/vote", func(c *gin.Context) {
+			castVote(contract, c)
+		})
+
 	}
 	return r
 }
@@ -75,7 +95,7 @@ func helloWorld(c *gin.Context) {
 // @Tags Candidate
 // @Accept  json
 // @Produce  json
-// @Body  {object} candidate
+// @Body  {object} name, studentID, electionID
 // @Success 200 {string} string "Candidate created"
 // @Router /candidate [post]
 func createCandidate(contract *client.Contract, c *gin.Context) {
@@ -117,12 +137,15 @@ func getCandidatesByElectionId(contract *client.Contract, c *gin.Context) {
 
 	fmt.Printf("*** Transaction result: %s\n", string(result))
 
-	r := string(result)
-	// out, _ := json.Marshal(string(r))
+	var response interface{}
+	err = json.Unmarshal(result, &response)
+	if err != nil {
+		panic(fmt.Errorf("failed to unmarshal JSON data: %w", err))
+	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Candidate fetched successfully.",
-		"data":    r,
+		"message": "Candidates fetched",
+		"data":    response,
 	})
 }
 
@@ -142,7 +165,15 @@ func createElection(contract *client.Contract, c *gin.Context) {
 		return
 	}
 
-	_, err := contract.SubmitTransaction("createElection", election.ElectionName, election.StartDate, election.EndDate, election.ElectionID)
+	// generate electionID using timestamp
+	// eg election.1621234567
+	// which translates to election.<timestamp>
+	currentTime := time.Now()
+	electionID := fmt.Sprintf("election.%d", currentTime.Unix())
+	// time in readable utc
+	createdAt := currentTime.UTC().String()
+
+	_, err := contract.SubmitTransaction("createElection", election.ElectionName, election.StartDate, election.EndDate, electionID, createdAt)
 	if err != nil {
 		panic(fmt.Errorf("failed to submit transaction: %w", err))
 	}
@@ -196,11 +227,71 @@ func getAllElections(contract *client.Contract, c *gin.Context) {
 
 	fmt.Printf("*** Transaction result: %s\n", string(result))
 
-	r := string(result)
+	var response interface{}
+	err = json.Unmarshal(result, &response)
+	if err != nil {
+		panic(fmt.Errorf("failed to unmarshal JSON data: %w", err))
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Elections fetched successfully.",
-		"data":    r,
+		"data":    response,
 	})
 
+}
+
+// @Summary Create Voter
+// @Description Create a new voter
+// @Tags Voter
+// @Accept  json
+// @Produce  json
+// @Body  {object} name, studentID, electionID
+// @Success 200 {string} string "Voter created"
+// @Router /voter [post]
+func createVoter(contract *client.Contract, c *gin.Context) {
+
+	var voter voter
+	if err := c.ShouldBindJSON(&voter); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	_, err := contract.SubmitTransaction("createVoter", voter.StudentID, voter.ElectionID, voter.Email)
+	if err != nil {
+		panic(fmt.Errorf("failed to submit transaction: %w", err))
+	}
+
+	fmt.Printf("*** Transaction committed successfully\n")
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Voter created. Txn committed successfully.",
+	})
+}
+
+// @Summary vote
+// @Description vote for a candidate
+// @Tags Ballot
+// @Accept  json
+// @Produce  json
+// @Body  {object} voterID, candidateID
+// @Success 200 {string} string "Vote casted"
+// @Router /ballot/vote [post]
+func castVote(contract *client.Contract, c *gin.Context) {
+
+	var vote vote
+	if err := c.ShouldBindJSON(&vote); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	_, err := contract.SubmitTransaction("vote", vote.VoterID, vote.CandidateID)
+	if err != nil {
+		panic(fmt.Errorf("failed to submit transaction: %w", err))
+	}
+
+	fmt.Printf("*** Transaction committed successfully\n")
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Vote casted. Txn committed successfully.",
+	})
 }
