@@ -1,6 +1,6 @@
-import '@/styles/globals.css'
 import type { AppProps } from 'next/app'
 import { ChakraProvider } from '@chakra-ui/react'
+import { ColorModeScript } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import {
   FiHome,
@@ -8,6 +8,7 @@ import {
   FiBarChart,
 } from 'react-icons/fi';
 import SidebarWithHeader from '@/components/layouts/SidebarWithHeader'
+import { extendTheme, type ThemeConfig } from '@chakra-ui/react'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -16,10 +17,9 @@ export default function App({ Component, pageProps }: AppProps) {
     { name: 'Pilihan raya', icon: FiTrendingUp, route: '/admin/election' },
     { name: 'Keputusan', icon: FiBarChart, route: '/admin/result' },
   ];
-
+  
   return (
     <ChakraProvider>
-      {/* if url is admin include sidebar */}
       {router.pathname.includes('admin') ? (
         <SidebarWithHeader linkItems={LinkItems}>
           <Component {...pageProps} />

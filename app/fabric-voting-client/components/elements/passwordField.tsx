@@ -6,6 +6,7 @@ import {
   InputGroup,
   InputProps,
   InputRightElement,
+  useColorModeValue,
   useDisclosure,
   useMergeRefs,
 } from '@chakra-ui/react'
@@ -38,7 +39,7 @@ export const PasswordField = forwardRef<HTMLInputElement, InputProps>((props, re
         </InputRightElement>
         <Input
           id="password"
-          bg="gray.700" borderColor="gray.600"
+          bg={useColorModeValue("gray.200", "gray.700")} borderColor={useColorModeValue("gray.400", "gray.600")} 
           ref={mergeRef}
           name="password"
           type={isOpen ? 'text' : 'password'}

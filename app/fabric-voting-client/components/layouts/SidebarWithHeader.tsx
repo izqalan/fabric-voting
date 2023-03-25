@@ -21,11 +21,14 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
+  useColorMode,
 } from '@chakra-ui/react';
 import {
   FiMenu,
   FiBell,
   FiChevronDown,
+  FiMoon,
+  FiSun,
 } from 'react-icons/fi';
 import { IconType } from 'react-icons';
 import { useRouter } from 'next/router'
@@ -45,7 +48,7 @@ export default function SidebarWithHeader({
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
-    <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
+    <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')} textColor={useColorModeValue('gray.700', 'inherit')}>
       <SidebarContent
         LinkItems={linkItems}
         onClose={() => onClose}
@@ -81,7 +84,6 @@ const SidebarContent = ({ LinkItems, onClose, ...rest }: SidebarProps) => {
   const router = useRouter();
   return (
     <Box
-      transition="3s ease"
       bg={useColorModeValue('white', 'gray.900')}
       borderRight="1px"
       borderRightColor={useColorModeValue('gray.200', 'gray.700')}
@@ -90,8 +92,9 @@ const SidebarContent = ({ LinkItems, onClose, ...rest }: SidebarProps) => {
       h="full"
       {...rest}>
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Logo
+        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold" bgGradient='linear(to-l, #7928CA, #FF0080)'
+          bgClip='text'>
+          Fabric Voting
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
@@ -144,6 +147,8 @@ interface MobileProps extends FlexProps {
   onOpen: () => void;
 }
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
+  const { colorMode, toggleColorMode } = useColorMode()
+
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -167,8 +172,11 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         display={{ base: 'flex', md: 'none' }}
         fontSize="2xl"
         fontFamily="monospace"
-        fontWeight="bold">
-        Logo
+        fontWeight="bold"
+        bgGradient='linear(to-l, #7928CA, #FF0080)'
+        bgClip='text'
+      >
+        Fabric Voting
       </Text>
 
       <HStack spacing={{ base: '0', md: '6' }}>
@@ -178,6 +186,14 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
           aria-label="open menu"
           icon={<FiBell />}
         />
+        <IconButton
+          size="lg"
+          variant="ghost"
+          aria-label="open menu"
+          icon={colorMode === 'light' ? <FiMoon /> : <FiSun />}
+          onClick={toggleColorMode}
+        />
+
         <Flex alignItems={'center'}>
           <Menu>
             <MenuButton
@@ -196,7 +212,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
                   alignItems="flex-start"
                   spacing="1px"
                   ml="2">
-                  <Text fontSize="sm">Justina Clark</Text>
+                  <Text fontSize="sm">Izqalan Nor'Izad</Text>
                   <Text fontSize="xs" color="gray.600">
                     Admin
                   </Text>
