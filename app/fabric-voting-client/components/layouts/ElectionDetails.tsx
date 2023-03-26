@@ -174,7 +174,7 @@ export default function ElectionDetails({
                 <Th>Name</Th>
                 <Th>Faculty</Th>
                 <Th>Party</Th>
-                <Th isNumeric>Votes</Th>
+                {/* <Th isNumeric>Votes</Th> */}
               </Tr>
             </Thead>
             <Tbody overflow="scroll" maxHeight="50vh">
@@ -222,7 +222,7 @@ export default function ElectionDetails({
                     </Text>
                   </Td>
                   <Td>{candidate.party}</Td>
-                  <Td isNumeric>{candidate.votes}</Td>
+                  {/* <Td isNumeric>{candidate.votes}</Td> */}
                 </Tr>
               ))}
             </Tbody>
