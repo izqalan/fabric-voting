@@ -92,7 +92,7 @@ const SidebarContent = ({ LinkItems, onClose, ...rest }: SidebarProps) => {
       h="full"
       {...rest}>
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold" bgGradient='linear(to-l, #7928CA, #FF0080)'
+        <Text fontSize="xl" fontFamily="monospace" fontWeight="bold" bgGradient='linear(to-l, #7928CA, #FF0080)'
           bgClip='text'>
           Fabric Voting
         </Text>
@@ -170,7 +170,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 
       <Text
         display={{ base: 'flex', md: 'none' }}
-        fontSize="2xl"
+        fontSize="xl"
         fontFamily="monospace"
         fontWeight="bold"
         bgGradient='linear(to-l, #7928CA, #FF0080)'
