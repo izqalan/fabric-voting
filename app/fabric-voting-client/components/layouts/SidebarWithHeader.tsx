@@ -48,7 +48,7 @@ export default function SidebarWithHeader({
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
-    <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')} textColor={useColorModeValue('gray.700', 'inherit')}>
+    <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.800')} textColor={useColorModeValue('gray.700', 'inherit')}>
       <SidebarContent
         LinkItems={linkItems}
         onClose={() => onClose}
