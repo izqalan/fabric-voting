@@ -1,4 +1,4 @@
-import { Flex, Box, Text, Image, chakra } from "@chakra-ui/react";
+import { Flex, Box, Text, Image, useDisclosure, chakra } from "@chakra-ui/react";
 import { formatDistance, format } from "date-fns";
 import { IconButton } from "@chakra-ui/react";
 import { FiClipboard } from "react-icons/fi";
@@ -24,6 +24,16 @@ export default function ElectionCard({
   style
 }: ElectionCardProps) {
 
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
+  let candidates = [{
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
+  }, {
+    avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80"
+  }, {
+    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=761&q=80"
+  }
+  ]
 
   return (
     <Box
@@ -89,7 +99,7 @@ export default function ElectionCard({
 
       <Box mt={2}>
         <Text
-          fontSize="2xl"
+          fontSize="xl"
           color="gray.700"
           _dark={{
             color: "white",
@@ -115,6 +125,40 @@ export default function ElectionCard({
           Election starts from {format(startDate, 'd MMMM yyyy')} and ends at {format(endDate, 'd MMMM yyyy')}
         </chakra.p>
       </Box>
+      <Flex justifyContent="right" alignItems="center" mt={4}>
+        {/**
+         * TODO: update api and chaincode to include candidate avatar
+         * */}
+        {candidates.map((candidate, index) => (
+          <Image
+            w={10}
+            h={10}
+            rounded="full"
+            fit="cover"
+            border="2px"
+            borderColor="white"
+            marginRight={index * 6}
+            position={{
+              base: "absolute",
+            }}
+            display={{
+              base: "none",
+              sm: "block",
+            }}
+            src={candidate.avatar}
+            alt="avatar"
+            zIndex={candidates.length - index}
+          />))
+        }
+
+        {/* hacky way to prevent the avatars from overlapping the card */}
+        <div id="spacer" style={{
+          width: "10px",
+          height: "25px",
+          marginRight: "0px"
+        }} ></div>
+
+      </Flex>
     </Box>
   )
 }
