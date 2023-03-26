@@ -29,9 +29,11 @@ import {
   useDisclosure,
   InputGroup,
   InputLeftAddon,
+  VStack,
 } from "@chakra-ui/react";
+import { format } from "date-fns";
 import { useRef } from "react";
-import { FiClipboard } from "react-icons/fi";
+import { FiClipboard, FiUserPlus } from "react-icons/fi";
 import copyMessage from "../utils/copyMessage";
 
 interface ElectionDetailsProps {
@@ -96,10 +98,11 @@ export default function ElectionDetails({
       shadow="lg"
       rounded="lg"
     >
-      <Flex direction="column" w="fit-content" width="full">
+      <Flex direction="column" width="full">
         {/* horizontal stack */}
-        <HStack w="full" justifyContent="space-between">
+        <Flex w="full" justifyContent="space-between"  alignItems={"center"}>
           <Text
+            h={"fit-content"}
             px={3}
             py={1}
             bg={new Date() > endDate ? "red.400" : "green.400"}
@@ -107,11 +110,12 @@ export default function ElectionDetails({
             fontSize="sm"
             fontWeight="700"
             rounded="md"
+
           >
             {new Date() > endDate ? "Ended" : "Ongoing"}
           </Text>
           <IconButton
-            size="lg"
+            size="md"
             colorScheme="gray"
             variant="ghost"
             mx={3}
@@ -121,9 +125,29 @@ export default function ElectionDetails({
               copyMessage(electionID);
             }}
           />
-        </HStack>
+        </Flex>
 
-        <Heading mt={2}>{electionName}</Heading>
+        <Flex justifyContent="space-between" alignItems={"end"}>
+          <Flex direction="column" justifyItems="start">
+            <Heading mt={2}>{electionName}</Heading>
+            <Text color="gray.500" fontSize="sm">
+              {format(startDate, "PPppp")} ~ {format(endDate, "PPppp")}
+            </Text>
+            <Text color="gray.500" fontSize="sm">
+              Last updated at {format(updatedAt, "PPpp")}
+            </Text>
+          </Flex>
+          <IconButton
+            size="md"
+            colorScheme="purple"
+            variant="outline"
+            mx={3}
+            aria-label="copy eletion url"
+            icon={<FiUserPlus />}
+            onClick={onOpen}
+          />
+        </Flex>
+
         <TableContainer>
           <Table variant="simple">
             <Thead>
@@ -185,7 +209,6 @@ export default function ElectionDetails({
             </Tbody>
           </Table>
         </TableContainer>
-        <Button onClick={onOpen}>Add Candidate</Button>
 
         <Modal initialFocusRef={btnRef} isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
@@ -213,7 +236,7 @@ export default function ElectionDetails({
                 <Input placeholder="Faculty" />
               </FormControl>
 
-              <InputGroup  mt={4}>
+              <InputGroup mt={4}>
                 <FormLabel>Profile picture</FormLabel>
                 {/* eslint-disable-next-line react/no-children-prop */}
                 <InputLeftAddon children="https://" />

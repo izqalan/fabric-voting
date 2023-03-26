@@ -18,7 +18,7 @@ export default function Election() {
       direction="row"
       flexWrap="wrap"
     >
-      <Flex direction="column" w="40%" p={4}>
+      <Flex direction="column" w="40%" px={2}>
         <ElectionCard
           ref={btnRef}
           electionName="Pilihan Raya Univ. Malaya #99"
