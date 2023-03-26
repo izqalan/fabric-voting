@@ -11,13 +11,23 @@ interface ElectionCardProps {
   endDate: Date;
   createdAt: Date;
   updatedAt: Date;
+  style?: React.CSSProperties;
 }
 
-export default function ElectionCard({ electionName, electionID, startDate, endDate, createdAt, updatedAt }: ElectionCardProps) {
+export default function ElectionCard({
+  electionName,
+  electionID,
+  startDate,
+  endDate,
+  createdAt,
+  updatedAt,
+  style
+}: ElectionCardProps) {
 
 
   return (
     <Box
+      style={style}
       px={8}
       py={4}
       rounded="lg"
@@ -66,7 +76,7 @@ export default function ElectionCard({ electionName, electionID, startDate, endD
           <Text
             px={3}
             py={1}
-            bg={new Date > endDate ? "red.500" : "green.500"}
+            bg={new Date > endDate ? "red.400" : "green.400"}
             color="gray.100"
             fontSize="sm"
             fontWeight="700"
