@@ -11,12 +11,10 @@ import {
   TableContainer,
   Tbody,
   Td,
-  Tfoot,
   Th,
   Thead,
   Tr,
   Image,
-  VStack,
   Button,
   FormControl,
   FormLabel,
@@ -31,7 +29,6 @@ import {
   useDisclosure,
   InputGroup,
   InputLeftAddon,
-  InputRightAddon,
 } from "@chakra-ui/react";
 import { useRef } from "react";
 import { FiClipboard } from "react-icons/fi";

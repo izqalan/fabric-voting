@@ -5,7 +5,6 @@ import { addDays, subDays } from "date-fns"
 import {
   useDisclosure,
   Flex,
-  Button,
 } from "@chakra-ui/react"
 
 
@@ -22,8 +21,8 @@ export default function Election() {
       <Flex direction="column" w="40%" p={4}>
         <ElectionCard
           ref={btnRef}
-          electionName="Pilihan Raya UM #99"
-          electionID="election.1234567890"
+          electionName="Pilihan Raya Univ. Malaya #99"
+          electionID="election.88888888"
           startDate={subDays(new Date(), 2)}
           endDate={addDays(new Date(), 7)}
           createdAt={subDays(new Date(), 2)}
@@ -43,8 +42,8 @@ export default function Election() {
         />
       </Flex>
       <ElectionDetails 
-        electionName="Pilihan Raya UM #99"
-        electionID="election.1234567890"
+        electionName="Pilihan Raya Univ. Malaya #99"
+        electionID="election.88888888"
         startDate={subDays(new Date(), 2)}
         endDate={addDays(new Date(), 7)}
         createdAt={subDays(new Date(), 2)}

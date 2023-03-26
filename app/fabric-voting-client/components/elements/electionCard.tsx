@@ -73,7 +73,7 @@ export default function ElectionCard({
         >
           {/* if date has passed 'ended' */}
           {new Date > endDate ? "Ended " : "Ends "}
-          {formatDistance(endDate, startDate, { addSuffix: true })}
+          {formatDistance(endDate, new Date(), { addSuffix: true })}
         </chakra.span>
         <Flex alignItems="center">
           <IconButton
