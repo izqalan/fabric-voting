@@ -1,4 +1,4 @@
-import { Flex, Box, Text, Image, useDisclosure, chakra } from "@chakra-ui/react";
+import { Flex, Box, Text, Image, chakra } from "@chakra-ui/react";
 import { formatDistance, format } from "date-fns";
 import { IconButton } from "@chakra-ui/react";
 import { FiClipboard } from "react-icons/fi";
@@ -12,6 +12,8 @@ interface ElectionCardProps {
   createdAt: Date;
   updatedAt: Date;
   style?: React.CSSProperties;
+  onClick?: () => void;
+  ref?: any;
 }
 
 export default function ElectionCard({
@@ -21,10 +23,10 @@ export default function ElectionCard({
   endDate,
   createdAt,
   updatedAt,
+  onClick,
+  ref,
   style
 }: ElectionCardProps) {
-
-  const { isOpen, onOpen, onClose } = useDisclosure()
 
   let candidates = [{
     avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
@@ -37,6 +39,7 @@ export default function ElectionCard({
 
   return (
     <Box
+      ref={ref}
       style={style}
       px={8}
       py={4}
@@ -58,6 +61,7 @@ export default function ElectionCard({
       }}
       cursor="pointer"
       boxShadow='linear(to-l, #7928CA, #FF0080)'
+      onClick={onClick}
     >
       <Flex justifyContent="space-between" alignItems="center">
         <chakra.span
@@ -131,6 +135,7 @@ export default function ElectionCard({
          * */}
         {candidates.map((candidate, index) => (
           <Image
+            key={index}
             w={10}
             h={10}
             rounded="full"
