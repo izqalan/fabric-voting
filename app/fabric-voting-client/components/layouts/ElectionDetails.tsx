@@ -30,10 +30,19 @@ import {
   InputGroup,
   InputLeftAddon,
   VStack,
+  MenuItem,
+  Menu,
+  MenuButton,
+  MenuList,
 } from "@chakra-ui/react";
 import { format } from "date-fns";
 import { useRef } from "react";
-import { FiClipboard, FiUserPlus } from "react-icons/fi";
+import {
+  FiChevronDown,
+  FiChevronsDown,
+  FiClipboard,
+  FiUserPlus,
+} from "react-icons/fi";
 import copyMessage from "../utils/copyMessage";
 
 interface ElectionDetailsProps {
@@ -100,7 +109,7 @@ export default function ElectionDetails({
     >
       <Flex direction="column" width="full">
         {/* horizontal stack */}
-        <Flex w="full" justifyContent="space-between"  alignItems={"center"}>
+        <Flex w="full" justifyContent="space-between" alignItems={"center"}>
           <Text
             h={"fit-content"}
             px={3}
@@ -110,7 +119,6 @@ export default function ElectionDetails({
             fontSize="sm"
             fontWeight="700"
             rounded="md"
-
           >
             {new Date() > endDate ? "Ended" : "Ongoing"}
           </Text>
@@ -137,15 +145,26 @@ export default function ElectionDetails({
               Last updated at {format(updatedAt, "PPpp")}
             </Text>
           </Flex>
-          <IconButton
-            size="md"
-            colorScheme="purple"
-            variant="outline"
-            mx={3}
-            aria-label="copy eletion url"
-            icon={<FiUserPlus />}
-            onClick={onOpen}
-          />
+          <VStack alignItems={"end"}>
+            <Menu>
+              <MenuButton px={"2"} as={Button} rightIcon={<FiChevronDown />}>
+                Actions
+              </MenuButton>
+              <MenuList>
+                <MenuItem>View Result</MenuItem>
+                {new Date() < endDate && <MenuItem color={"red.500"}>End Election</MenuItem>}
+              </MenuList>
+            </Menu>
+            <IconButton
+              size="md"
+              colorScheme="purple"
+              variant="outline"
+              mx={3}
+              aria-label="copy eletion url"
+              icon={<FiUserPlus />}
+              onClick={onOpen}
+            />
+          </VStack>
         </Flex>
 
         <TableContainer>
