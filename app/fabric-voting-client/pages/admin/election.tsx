@@ -48,7 +48,7 @@ export default function Election() {
         >
           New election
         </Button>
-        <Flex direction="column" overflow="scroll" maxHeight={"85vh"}>
+        <Flex direction="column" overflow="scroll" maxHeight={"79vh"}>
           <ElectionCard
             ref={btnRef}
             electionName="Pilihan Raya Univ. Malaya #99"
