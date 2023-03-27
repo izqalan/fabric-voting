@@ -22,6 +22,7 @@ type candidate struct {
 	Faculty    string `json:"faculty"`
 	Party      string `json:"party"`
 	ElectionID string `json:"electionID"`
+	Avatar     string `json:"avatar"`
 }
 
 // voter struct
@@ -328,7 +329,7 @@ func (t *VotingChaincode) createElection(stub shim.ChaincodeStubInterface, args 
 
 // create candidate function
 func (t *VotingChaincode) createCandidate(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 5 {
+	if len(args) != 6 {
 		return shim.Error("Incorrect number of arguments. Expecting 3")
 	}
 	candidateName := args[0]
@@ -337,7 +338,8 @@ func (t *VotingChaincode) createCandidate(stub shim.ChaincodeStubInterface, args
 	electionId := args[2]
 	faculty := args[3]
 	party := args[4]
-	var candidate = &candidate{Name: candidateName, Votes: 0, StudentID: studentId, ElectionID: electionId, Faculty: faculty, Party: party}
+	avatar := args[5]
+	var candidate = &candidate{Name: candidateName, Votes: 0, StudentID: studentId, ElectionID: electionId, Faculty: faculty, Party: party, Avatar: avatar}
 	candidateAsBytes, _ := json.Marshal(candidate)
 	err := stub.PutState(studentId, candidateAsBytes)
 	if err != nil {
