@@ -18,7 +18,7 @@ export default function Election() {
       direction="row"
       flexWrap="wrap"
     >
-      <Flex direction="column" w="40%" px={2}>
+      <Flex direction="column" w="40%" px={2} overflow="scroll" maxHeight={"85vh"}>
         <ElectionCard
           ref={btnRef}
           electionName="Pilihan Raya Univ. Malaya #99"
@@ -29,6 +29,36 @@ export default function Election() {
           updatedAt={subDays(new Date(), 1)}
           style={{ marginBottom: 16 }}
           onClick={onOpen}
+        />
+        <ElectionCard
+          ref={btnRef}
+          electionName="Pilihan raya kampus UKM #42"
+          electionID="election.1234567890"
+          startDate={subDays(new Date(), 7)}
+          endDate={subDays(new Date(), 2)}
+          createdAt={subDays(new Date(), 7)}
+          updatedAt={subDays(new Date(), 7)}
+          style={{ marginBottom: 16 }}
+        />
+        <ElectionCard
+          ref={btnRef}
+          electionName="Pilihan raya kampus UKM #42"
+          electionID="election.1234567890"
+          startDate={subDays(new Date(), 7)}
+          endDate={subDays(new Date(), 2)}
+          createdAt={subDays(new Date(), 7)}
+          updatedAt={subDays(new Date(), 7)}
+          style={{ marginBottom: 16 }}
+        />
+        <ElectionCard
+          ref={btnRef}
+          electionName="Pilihan raya kampus UKM #42"
+          electionID="election.1234567890"
+          startDate={subDays(new Date(), 7)}
+          endDate={subDays(new Date(), 2)}
+          createdAt={subDays(new Date(), 7)}
+          updatedAt={subDays(new Date(), 7)}
+          style={{ marginBottom: 16 }}
         />
         <ElectionCard
           ref={btnRef}
