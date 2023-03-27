@@ -33,6 +33,7 @@ export default function Election() {
   const btnRef = React.useRef(null);
 
   const [startDate, setStartDate] = useState(new Date())
+  const [endDate, setEndDate] = useState(addDays(new Date(), 1))
 
   return (
     <Flex direction="row" flexWrap="wrap">
@@ -121,17 +122,32 @@ export default function Election() {
           <ModalBody pb={6}>
             <FormControl>
               <FormLabel>Election Name</FormLabel>
-              <Input ref={btnRef} placeholder="Eg: PRU Ke-14" />
+              <Input ref={btnRef} placeholder="Eg: PRU Ke-14" required />
             </FormControl>
 
             <FormControl mt={4}>
               <FormLabel>Start date</FormLabel>
               <DatePicker
-                id="date"
+                id="startDate"
                 selected={startDate}
                 onChange={(date) => setStartDate(date)}
                 showTimeSelect
-                dateFormat="MM/dd/yyyy h:mm aa"
+                dateFormat="dd/MM/yyyy h:mm aa"
+                minDate={new Date()}
+                required
+              />
+            </FormControl>
+
+            <FormControl mt={4}>
+              <FormLabel>End date</FormLabel>
+              <DatePicker
+                id="endDate"
+                selected={endDate}
+                onChange={(date) => setEndDate(date)}
+                showTimeSelect
+                dateFormat="dd/MM/yyyy h:mm aa"
+                minDate={startDate}
+                required
               />
             </FormControl>
           </ModalBody>
