@@ -129,7 +129,7 @@ export default function ElectionCard({
           Election starts from {format(startDate, 'd MMMM yyyy')} and ends at {format(endDate, 'd MMMM yyyy')}
         </chakra.p>
       </Box>
-      <Flex justifyContent="right" alignItems="center" mt={4}>
+      <Flex justifyContent="right" alignItems="center" mt={4} position="relative">
         {/**
          * TODO: update api and chaincode to include candidate avatar
          * */}
@@ -159,7 +159,7 @@ export default function ElectionCard({
         {/* hacky way to prevent the avatars from overlapping the card */}
         <div id="spacer" style={{
           width: "10px",
-          height: "25px",
+          height: "30px",
           marginRight: "0px"
         }} ></div>
 
