@@ -13,7 +13,10 @@ import (
 type candidate struct {
 	Name       string `json:"name"`
 	StudentID  string `json:"studentID"`
+	Faculty    string `json:"faculty"`
+	Party      string `json:"party"`
 	ElectionID string `json:"electionID"`
+	Avatar     string `json:"avatar"`
 }
 
 type election struct {
@@ -96,7 +99,7 @@ func helloWorld(c *gin.Context) {
 // @Tags Candidate
 // @Accept  json
 // @Produce  json
-// @Body  {object} name, studentID, electionID
+// @Body  {object} name, studentID, electionID, faculty, party, avatar
 // @Success 200 {string} string "Candidate created"
 // @Router /candidate [post]
 func createCandidate(contract *client.Contract, c *gin.Context) {
@@ -108,7 +111,7 @@ func createCandidate(contract *client.Contract, c *gin.Context) {
 		return
 	}
 
-	_, err := contract.SubmitTransaction("createCandidate", candidate.Name, candidate.StudentID, candidate.ElectionID)
+	_, err := contract.SubmitTransaction("createCandidate", candidate.Name, candidate.StudentID, candidate.ElectionID, candidate.Faculty, candidate.Party, candidate.Avatar)
 	if err != nil {
 		panic(fmt.Errorf("failed to submit transaction: %w", err))
 	}
@@ -217,7 +220,7 @@ func getElectionById(contract *client.Contract, c *gin.Context) {
 // @Tags Election
 // @Accept  json
 // @Produce  json
-// @Success 200 {json}
+// @Success 200 {string} string "Elections fetched"
 // @Router /election [get]
 func getAllElections(contract *client.Contract, c *gin.Context) {
 	// get all elections using queryByRange function chaincode

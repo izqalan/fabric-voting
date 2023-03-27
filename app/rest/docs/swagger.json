@@ -13,6 +13,29 @@
     "host": "localhost:8081",
     "basePath": "/api/v1",
     "paths": {
+        "/ballot/vote": {
+            "post": {
+                "description": "vote for a candidate",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Ballot"
+                ],
+                "summary": "vote",
+                "responses": {
+                    "200": {
+                        "description": "Vote casted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/candidate": {
             "post": {
                 "description": "Create a new candidate",
@@ -36,7 +59,60 @@
                 }
             }
         },
+        "/candidate/{electionID}": {
+            "get": {
+                "description": "Get candidate by electionID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Get Candidate",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Election ID",
+                        "name": "electionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Candidates fetched",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/election": {
+            "get": {
+                "description": "Get all elections",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Election"
+                ],
+                "summary": "Get All Elections",
+                "responses": {
+                    "200": {
+                        "description": "Elections fetched",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create a new election",
                 "consumes": [
@@ -71,7 +147,7 @@
                 "tags": [
                     "Election"
                 ],
-                "summary": "Get Election",
+                "summary": "Get Election by id",
                 "parameters": [
                     {
                         "type": "string",
@@ -84,6 +160,36 @@
                 "responses": {
                     "200": {
                         "description": "Election created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update election by electionID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Election"
+                ],
+                "summary": "Update Election",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Election ID",
+                        "name": "electionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Election updated",
                         "schema": {
                             "type": "string"
                         }
@@ -124,6 +230,29 @@
                 "responses": {
                     "200": {
                         "description": "pong",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/voter": {
+            "post": {
+                "description": "Create a new voter",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Voter"
+                ],
+                "summary": "Create Voter",
+                "responses": {
+                    "200": {
+                        "description": "Voter created",
                         "schema": {
                             "type": "string"
                         }

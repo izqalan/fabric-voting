@@ -9,6 +9,21 @@ info:
   title: Fabric Voting API
   version: "1.0"
 paths:
+  /ballot/vote:
+    post:
+      consumes:
+      - application/json
+      description: vote for a candidate
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Vote casted
+          schema:
+            type: string
+      summary: vote
+      tags:
+      - Ballot
   /candidate:
     post:
       consumes:
@@ -24,7 +39,42 @@ paths:
       summary: Create Candidate
       tags:
       - Candidate
+  /candidate/{electionID}:
+    get:
+      consumes:
+      - application/json
+      description: Get candidate by electionID
+      parameters:
+      - description: Election ID
+        in: path
+        name: electionID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Candidates fetched
+          schema:
+            type: string
+      summary: Get Candidate
+      tags:
+      - Candidate
   /election:
+    get:
+      consumes:
+      - application/json
+      description: Get all elections
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Elections fetched
+          schema:
+            type: string
+      summary: Get All Elections
+      tags:
+      - Election
     post:
       consumes:
       - application/json
@@ -57,7 +107,27 @@ paths:
           description: Election created
           schema:
             type: string
-      summary: Get Election
+      summary: Get Election by id
+      tags:
+      - Election
+    put:
+      consumes:
+      - application/json
+      description: Update election by electionID
+      parameters:
+      - description: Election ID
+        in: path
+        name: electionID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Election updated
+          schema:
+            type: string
+      summary: Update Election
       tags:
       - Election
   /hello:
@@ -86,4 +156,19 @@ paths:
       summary: Ping Pong
       tags:
       - Signal
+  /voter:
+    post:
+      consumes:
+      - application/json
+      description: Create a new voter
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Voter created
+          schema:
+            type: string
+      summary: Create Voter
+      tags:
+      - Voter
 swagger: "2.0"
