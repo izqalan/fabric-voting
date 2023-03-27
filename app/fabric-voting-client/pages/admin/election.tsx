@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState} from "react";
 import ElectionCard from "@/components/elements/electionCard";
 import ElectionDetails from "@/components/layouts/ElectionDetails";
 import { addDays, subDays, format, isValid } from "date-fns";
@@ -17,6 +17,7 @@ import {
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/react";
+import DatePicker from "@/components/elements/date-picker";
 
 export default function Election() {
   const {
@@ -30,6 +31,8 @@ export default function Election() {
     onClose: onDatePickerClose,
   } = useDisclosure();
   const btnRef = React.useRef(null);
+
+  const [startDate, setStartDate] = useState(new Date())
 
   return (
     <Flex direction="row" flexWrap="wrap">
@@ -106,7 +109,11 @@ export default function Election() {
         updatedAt={subDays(new Date(), 1)}
       />
 
-      <Modal initialFocusRef={btnRef} isOpen={isNewElectionModalOpen} onClose={onNewElectionModalClose}>
+      <Modal
+        initialFocusRef={btnRef}
+        isOpen={isNewElectionModalOpen}
+        onClose={onNewElectionModalClose}
+      >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Create election</ModalHeader>
@@ -119,7 +126,13 @@ export default function Election() {
 
             <FormControl mt={4}>
               <FormLabel>Start date</FormLabel>
-              
+              <DatePicker
+                id="date"
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                showTimeSelect
+                dateFormat="MM/dd/yyyy h:mm aa"
+              />
             </FormControl>
           </ModalBody>
 

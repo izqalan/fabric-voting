@@ -8,6 +8,9 @@ import {
   FiBarChart,
 } from 'react-icons/fi';
 import SidebarWithHeader from '@/components/layouts/SidebarWithHeader'
+import 'react-datepicker/dist/react-datepicker.css';
+import '../styles/date-picker.css'
+
 import { extendTheme, type ThemeConfig } from '@chakra-ui/react'
 
 export default function App({ Component, pageProps }: AppProps) {
