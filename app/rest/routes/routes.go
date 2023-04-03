@@ -113,6 +113,7 @@ func createCandidate(contract *client.Contract, c *gin.Context) {
 
 	_, err := contract.SubmitTransaction("createCandidate", candidate.Name, candidate.StudentID, candidate.ElectionID, candidate.Faculty, candidate.Party, candidate.Avatar)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		panic(fmt.Errorf("failed to submit transaction: %w", err))
 	}
 
@@ -136,6 +137,7 @@ func getCandidatesByElectionId(contract *client.Contract, c *gin.Context) {
 	electionID := c.Param("electionID")
 	result, err := contract.EvaluateTransaction("getCandidatesById", electionID)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		panic(fmt.Errorf("failed to evaluate transaction: %w", err))
 	}
 
@@ -144,6 +146,7 @@ func getCandidatesByElectionId(contract *client.Contract, c *gin.Context) {
 	var response interface{}
 	err = json.Unmarshal(result, &response)
 	if err != nil {
+		c.JSON(http.StatusRequestTimeout, gin.H{"error": err.Error()})
 		panic(fmt.Errorf("failed to unmarshal JSON data: %w", err))
 	}
 
@@ -179,6 +182,7 @@ func createElection(contract *client.Contract, c *gin.Context) {
 
 	_, err := contract.SubmitTransaction("createElection", election.ElectionName, election.StartDate, election.EndDate, electionID, createdAt)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		panic(fmt.Errorf("failed to submit transaction: %w", err))
 	}
 
@@ -201,6 +205,7 @@ func getElectionById(contract *client.Contract, c *gin.Context) {
 	electionID := c.Param("electionID")
 	result, err := contract.EvaluateTransaction("getElectionById", electionID)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		panic(fmt.Errorf("failed to evaluate transaction: %w", err))
 	}
 
@@ -226,6 +231,7 @@ func getAllElections(contract *client.Contract, c *gin.Context) {
 	// get all elections using queryByRange function chaincode
 	result, err := contract.EvaluateTransaction("queryByRange", "election.", "election.z")
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		panic(fmt.Errorf("failed to query transaction: %w", err))
 	}
 
@@ -234,6 +240,7 @@ func getAllElections(contract *client.Contract, c *gin.Context) {
 	var response interface{}
 	err = json.Unmarshal(result, &response)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		panic(fmt.Errorf("failed to unmarshal JSON data: %w", err))
 	}
 
@@ -268,11 +275,13 @@ func updateElection(contract *client.Contract, c *gin.Context) {
 	// and then pass it to the chaincode
 	electionJSON, err := json.Marshal(election)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		panic(fmt.Errorf("failed to marshal JSON data: %w", err))
 	}
 
 	_, err = contract.SubmitTransaction("updateElection", electionID, string(electionJSON))
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		panic(fmt.Errorf("failed to submit transaction: %w", err))
 	}
 
@@ -301,6 +310,7 @@ func createVoter(contract *client.Contract, c *gin.Context) {
 
 	_, err := contract.SubmitTransaction("createVoter", voter.StudentID, voter.ElectionID, voter.Email)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		panic(fmt.Errorf("failed to submit transaction: %w", err))
 	}
 
@@ -329,6 +339,7 @@ func castVote(contract *client.Contract, c *gin.Context) {
 
 	_, err := contract.SubmitTransaction("vote", vote.VoterID, vote.CandidateID)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		panic(fmt.Errorf("failed to submit transaction: %w", err))
 	}
 
