@@ -25,7 +25,7 @@ import { isEmpty } from "lodash";
 
 export default function Election() {
   const toast = useToast();
-  const api = new Api("http://localhost:8081/api/v1");
+  const api = new Api();
   const {
     isOpen: isNewElectionModalOpen,
     onOpen: onNewElectionModalOpen,
@@ -102,7 +102,7 @@ export default function Election() {
             activeElections.map((election) => (
               <ElectionCard
                 ref={btnRef}
-                key={election.key}
+                key={election.Key}
                 electionName={election.Record.electionName}
                 electionID={election.Record.electionID}
                 startDate={new Date(election.Record.startDate)}
@@ -118,7 +118,7 @@ export default function Election() {
       {!isEmpty(selectedElection) && (
         <ElectionDetails
           electionName={selectedElection.Record.electionName}
-          electionID={selectedElection.key}
+          electionID={selectedElection.Key}
           startDate={new Date(selectedElection.Record.startDate)}
           endDate={new Date(selectedElection.Record.endDate)}
           createdAt={new Date(selectedElection.Record.createdAt)}

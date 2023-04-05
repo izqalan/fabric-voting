@@ -1,11 +1,7 @@
 // make rest api requests
 
 export default class Api {
-  url: string;
-  
-  constructor(url: string) {
-    this.url = url;
-  }
+  url = 'http://localhost:8081/api/v1';
 
   async get(path: string) {
     const res = await fetch(`${this.url}${path}`, {
