@@ -135,13 +135,13 @@ export default function ElectionDetails({
             h={"fit-content"}
             px={3}
             py={1}
-            bg={new Date() > endDate ? "red.400" : "green.400"}
+            bg={new Date() > endDate ? "red.400" : new Date() < startDate ? "purple.500" : "green.400" }
             color="gray.100"
             fontSize="sm"
             fontWeight="700"
             rounded="md"
           >
-            {new Date() > endDate ? "Ended" : "Ongoing"}
+            {new Date() > endDate ? "Ended" : new Date() < startDate ? "Upcoming" : "Ongoing"}
           </Text>
           <IconButton
             size="md"

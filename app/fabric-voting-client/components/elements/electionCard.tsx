@@ -90,13 +90,13 @@ export default function ElectionCard({
           <Text
             px={3}
             py={1}
-            bg={new Date > endDate ? "red.400" : "green.400"}
+            bg={new Date > endDate ? "red.400" : new Date > startDate ? "green.400" : "purple.500"}
             color="gray.100"
             fontSize="sm"
             fontWeight="700"
             rounded="md"
           >
-            {new Date > endDate ? "Ended" : "Ongoing"}
+            {new Date > endDate ? "Ended" : new Date > startDate ? "Ongoing" : "Upcoming"}
           </Text>
         </Flex>
       </Flex>
