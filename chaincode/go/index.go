@@ -352,59 +352,34 @@ func (t *VotingChaincode) createCandidate(stub shim.ChaincodeStubInterface, args
 }
 
 func (t *VotingChaincode) updateElection(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	// first param electionID
-	electionID := args[0]
+	electionId := args[0]
+	target := args[1]
+	value := args[2]
 
-	if len(args) != 1 {
-		return shim.Error("Incorrect number of arguments. Expecting 1")
-	}
-	var payload struct {
-		ElectionID   string `json:"electionId"`
-		ElectionName string `json:"electionName"`
-		StartDate    string `json:"startDate"`
-		EndDate      string `json:"endDate"`
-		UpdatedAt    string `json:"updatedAt"`
+	electionAsBytes, err := stub.GetState(electionId)
+	if err != nil {
+		return shim.Error("Failed to get election: " + electionId)
 	}
 
-	err := json.Unmarshal([]byte(args[0]), &payload)
+	election := election{}
+	json.Unmarshal(electionAsBytes, &election)
+
+	if target == "name" {
+		election.ElectionName = value
+	} else if target == "startDate" {
+		election.StartDate = value
+	} else if target == "endDate" {
+		election.EndDate = value
+	} else {
+		return shim.Error("Invalid target")
+	}
+
+	electionAsBytes, _ = json.Marshal(election)
+	err = stub.PutState(electionId, electionAsBytes)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 
-	if electionID == "" {
-		return shim.Error("Election ID is required")
-	}
-
-	// check if election exists
-	electionAsBytes, err := stub.GetState(electionID)
-	if err != nil {
-		return shim.Error("Failed to get election: " + err.Error())
-	} else if electionAsBytes == nil {
-		return shim.Error("Election does not exist")
-	}
-
-	// update election fields
-	election := &election{}
-	err = json.Unmarshal(electionAsBytes, election)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-	election.ElectionName = payload.ElectionName
-	election.StartDate = payload.StartDate
-	election.EndDate = payload.EndDate
-	election.UpdatedAt = &payload.UpdatedAt
-
-	// save updated election
-	electionAsBytes, err = json.Marshal(election)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-	err = stub.PutState(payload.ElectionID, electionAsBytes)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-
-	fmt.Printf("Election update successful %s", payload.ElectionID)
 	return shim.Success(nil)
 }
 
