@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ElectionCard from "@/components/elements/electionCard";
 import ElectionDetails from "@/components/layouts/ElectionDetails";
 import { addDays, subDays, format, isValid } from "date-fns";
@@ -21,6 +21,7 @@ import {
 import DatePicker from "@/components/elements/date-picker";
 import Api from "@/components/utils/api";
 import { useFormik } from "formik";
+import { isEmpty } from "lodash";
 
 export default function Election() {
   const toast = useToast();
@@ -39,39 +40,45 @@ export default function Election() {
 
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(addDays(new Date(), 1));
+  const [activeElections, setActiveElections] = useState<any[]>([]);
 
-  const handleCreateElection = async (
-    electionName: string,
-    startDate: Date,
-    endDate: Date
-  ) => {};
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await api.get("/election");
+      console.log(res)
+      if (res.status === 200){
+        setActiveElections(res.data);
+      }
+    };
+    fetchData();
+  }, []);
 
   const formik = useFormik({
     initialValues: {
-      electionName: '',
+      electionName: "",
     },
     onSubmit: async (values) => {
-      const res = await api.post('/election', {
+      const res = await api.post("/election", {
         electionName: values.electionName,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
-      })
-      console.log(res)
+      });
+      console.log(res);
       // check if response 201
       if (res.status === 201) {
-        onNewElectionModalClose()
+        onNewElectionModalClose();
         toast({
           title: `${res.message}`,
-          status: 'success',
+          status: "success",
           isClosable: true,
-        })
+        });
       } else {
         // show error
         toast({
           title: `Error: ${res.message}`,
-          status: 'error',
+          status: "error",
           isClosable: true,
-        })
+        });
       }
     },
   });
@@ -90,56 +97,21 @@ export default function Election() {
           New election
         </Button>
         <Flex direction="column" overflow="scroll" maxHeight={"79vh"}>
-          <ElectionCard
-            ref={btnRef}
-            electionName="Pilihan Raya Univ. Malaya #99"
-            electionID="election.88888888"
-            startDate={subDays(new Date(), 2)}
-            endDate={addDays(new Date(), 7)}
-            createdAt={subDays(new Date(), 2)}
-            updatedAt={subDays(new Date(), 1)}
-            style={{ marginBottom: 16 }}
-          />
-          <ElectionCard
-            ref={btnRef}
-            electionName="Pilihan raya kampus UKM #42"
-            electionID="election.1234567890"
-            startDate={subDays(new Date(), 7)}
-            endDate={subDays(new Date(), 2)}
-            createdAt={subDays(new Date(), 7)}
-            updatedAt={subDays(new Date(), 7)}
-            style={{ marginBottom: 16 }}
-          />
-          <ElectionCard
-            ref={btnRef}
-            electionName="Pilihan raya kampus UKM #42"
-            electionID="election.1234567890"
-            startDate={subDays(new Date(), 7)}
-            endDate={subDays(new Date(), 2)}
-            createdAt={subDays(new Date(), 7)}
-            updatedAt={subDays(new Date(), 7)}
-            style={{ marginBottom: 16 }}
-          />
-          <ElectionCard
-            ref={btnRef}
-            electionName="Pilihan raya kampus UKM #42"
-            electionID="election.1234567890"
-            startDate={subDays(new Date(), 7)}
-            endDate={subDays(new Date(), 2)}
-            createdAt={subDays(new Date(), 7)}
-            updatedAt={subDays(new Date(), 7)}
-            style={{ marginBottom: 16 }}
-          />
-          <ElectionCard
-            ref={btnRef}
-            electionName="Pilihan raya kampus UKM #42"
-            electionID="election.1234567890"
-            startDate={subDays(new Date(), 7)}
-            endDate={subDays(new Date(), 2)}
-            createdAt={subDays(new Date(), 7)}
-            updatedAt={subDays(new Date(), 7)}
-            style={{ marginBottom: 16 }}
-          />
+          {!isEmpty(activeElections) &&
+            activeElections.map((election) => (
+              <ElectionCard
+                ref={btnRef}
+                key={election.key}
+                electionName={election.Record.electionName}
+                electionID={election.Record.electionID}
+                startDate={new Date(election.Record.startDate)}
+                endDate={new Date(election.Record.endDate)}
+                createdAt={new Date(election.Record.createdAt)}
+                updatedAt={new Date(election.Record.updatedAt)}
+                style={{ marginBottom: 16 }}
+              />
+            ))}
+
         </Flex>
       </Flex>
       <ElectionDetails
@@ -162,18 +134,18 @@ export default function Election() {
           <ModalCloseButton />
 
           <form onSubmit={formik.handleSubmit}>
-          <ModalBody pb={6}>
+            <ModalBody pb={6}>
               <FormControl>
                 <FormLabel>Election Name</FormLabel>
-                <Input 
-                  ref={btnRef} 
+                <Input
+                  ref={btnRef}
                   id="electionName"
                   name="electionName"
-                  placeholder="Eg: PRU Ke-14" 
-                  required 
+                  placeholder="Eg: PRU Ke-14"
+                  required
                   value={formik.values.electionName}
                   onChange={formik.handleChange}
-                  />
+                />
               </FormControl>
 
               <FormControl mt={4}>
@@ -203,19 +175,14 @@ export default function Election() {
                   required
                 />
               </FormControl>
-          </ModalBody>
+            </ModalBody>
 
-          <ModalFooter>
-            <Button
-              colorScheme="blue"
-              mr={3}
-              type="submit"
-            >
-              Save
-            </Button>
-            <Button onClick={onNewElectionModalClose}>Cancel</Button>
-          </ModalFooter>
-
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} type="submit">
+                Save
+              </Button>
+              <Button onClick={onNewElectionModalClose}>Cancel</Button>
+            </ModalFooter>
           </form>
         </ModalContent>
       </Modal>

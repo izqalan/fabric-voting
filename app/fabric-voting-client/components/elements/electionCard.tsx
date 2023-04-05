@@ -84,7 +84,7 @@ export default function ElectionCard({
             aria-label="copy eletion url"
             icon={<FiClipboard />}
             onClick={() => {
-              copyMessage(electionID)
+              copyMessage(`http://localhost:3000/election/${electionID}`)
             }}
           />
           <Text
