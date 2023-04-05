@@ -41,12 +41,13 @@ export default function Election() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(addDays(new Date(), 1));
   const [activeElections, setActiveElections] = useState<any[]>([]);
+  const [selectedElection, setSelectedElection] = useState<any>({});
 
   useEffect(() => {
     const fetchData = async () => {
       const res = await api.get("/election");
-      console.log(res)
-      if (res.status === 200){
+      console.log(res);
+      if (res.status === 200) {
         setActiveElections(res.data);
       }
     };
@@ -109,20 +110,21 @@ export default function Election() {
                 createdAt={new Date(election.Record.createdAt)}
                 updatedAt={new Date(election.Record.updatedAt)}
                 style={{ marginBottom: 16 }}
+                onClick={() => setSelectedElection(election)}
               />
             ))}
-
         </Flex>
       </Flex>
-      <ElectionDetails
-        electionName="Pilihan Raya Univ. Malaya #99"
-        electionID="election.88888888"
-        startDate={subDays(new Date(), 2)}
-        endDate={addDays(new Date(), 7)}
-        createdAt={subDays(new Date(), 2)}
-        updatedAt={subDays(new Date(), 1)}
-      />
-
+      {!isEmpty(selectedElection) && (
+        <ElectionDetails
+          electionName={selectedElection.Record.electionName}
+          electionID={selectedElection.key}
+          startDate={new Date(selectedElection.Record.startDate)}
+          endDate={new Date(selectedElection.Record.endDate)}
+          createdAt={new Date(selectedElection.Record.createdAt)}
+          updatedAt={new Date(selectedElection.Record.updatedAt)}
+        />
+      )}
       <Modal
         initialFocusRef={btnRef}
         isOpen={isNewElectionModalOpen}
