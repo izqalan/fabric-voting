@@ -101,6 +101,7 @@ func helloWorld(c *gin.Context) {
 	// retunr in json
 	c.JSON(http.StatusOK, gin.H{
 		"message": "hello world",
+		"status":  http.StatusOK,
 	})
 }
 
@@ -130,8 +131,9 @@ func createCandidate(contract *client.Contract, c *gin.Context) {
 	fmt.Printf("*** Transaction committed successfully\n")
 
 	// retunr in json
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"message": "Candidate created. Txn committed successfully.",
+		"status":  http.StatusCreated,
 	})
 }
 
@@ -163,6 +165,7 @@ func getCandidatesByElectionId(contract *client.Contract, c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Candidates fetched",
 		"data":    response,
+		"status":  http.StatusOK,
 	})
 }
 
@@ -198,8 +201,12 @@ func createElection(contract *client.Contract, c *gin.Context) {
 
 	fmt.Printf("*** Transaction committed successfully\n")
 
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"message": "Election created. Txn committed successfully.",
+		"status":  http.StatusCreated,
+		"data": gin.H{
+			"electionID": electionID,
+		},
 	})
 }
 
@@ -227,6 +234,7 @@ func getElectionById(contract *client.Contract, c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Election fetched successfully.",
 		"data":    r,
+		"status":  http.StatusOK,
 	})
 }
 
@@ -257,6 +265,7 @@ func getAllElections(contract *client.Contract, c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Elections fetched successfully.",
 		"data":    response,
+		"status":  http.StatusOK,
 	})
 
 }
@@ -299,6 +308,7 @@ func updateElection(contract *client.Contract, c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Election updated. Txn committed successfully.",
+		"status":  http.StatusOK,
 	})
 }
 
@@ -328,6 +338,7 @@ func createVoter(contract *client.Contract, c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Voter created. Txn committed successfully.",
+		"status":  http.StatusOK,
 	})
 }
 
@@ -357,5 +368,6 @@ func castVote(contract *client.Contract, c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Vote casted. Txn committed successfully.",
+		"status":  http.StatusOK,
 	})
 }
