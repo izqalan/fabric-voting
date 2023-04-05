@@ -7,6 +7,7 @@ interface Props {
   onChange: (date: Date) => any;
   selectedDate: Date | undefined;
   showPopperArrow?: boolean;
+  name?: string;
 }
 
 const DatePicker = ({
@@ -14,6 +15,8 @@ const DatePicker = ({
   onChange,
   isClearable = false,
   showPopperArrow = false,
+  className,
+  name,
   ...props
 }: Props & HTMLAttributes<HTMLElement>) => {
   const isLight = useColorMode().colorMode === "light"; //you can check what theme you are using right now however you want
@@ -22,6 +25,7 @@ const DatePicker = ({
     // set className to "light-theme-original" ↓↓↓↓
     <div className={isLight ? "light-theme" : "dark-theme"}>
       <ReactDatePicker
+        name={name}
         selected={selectedDate}
         onChange={onChange}
         isClearable={isClearable}

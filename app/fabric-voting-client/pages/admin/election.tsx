@@ -1,4 +1,4 @@
-import React, { useState} from "react";
+import React, { useState } from "react";
 import ElectionCard from "@/components/elements/electionCard";
 import ElectionDetails from "@/components/layouts/ElectionDetails";
 import { addDays, subDays, format, isValid } from "date-fns";
@@ -16,10 +16,15 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  useToast,
 } from "@chakra-ui/react";
 import DatePicker from "@/components/elements/date-picker";
+import Api from "@/components/utils/api";
+import { useFormik } from "formik";
 
 export default function Election() {
+  const toast = useToast();
+  const api = new Api("http://localhost:8081/api/v1");
   const {
     isOpen: isNewElectionModalOpen,
     onOpen: onNewElectionModalOpen,
@@ -32,8 +37,44 @@ export default function Election() {
   } = useDisclosure();
   const btnRef = React.useRef(null);
 
-  const [startDate, setStartDate] = useState(new Date())
-  const [endDate, setEndDate] = useState(addDays(new Date(), 1))
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(addDays(new Date(), 1));
+
+  const handleCreateElection = async (
+    electionName: string,
+    startDate: Date,
+    endDate: Date
+  ) => {};
+
+  const formik = useFormik({
+    initialValues: {
+      electionName: '',
+    },
+    onSubmit: async (values) => {
+      const res = await api.post('/election', {
+        electionName: values.electionName,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      })
+      console.log(res)
+      // check if response 201
+      if (res.status === 201) {
+        onNewElectionModalClose()
+        toast({
+          title: `${res.message}`,
+          status: 'success',
+          isClosable: true,
+        })
+      } else {
+        // show error
+        toast({
+          title: `Error: ${res.message}`,
+          status: 'error',
+          isClosable: true,
+        })
+      }
+    },
+  });
 
   return (
     <Flex direction="row" flexWrap="wrap">
@@ -119,45 +160,63 @@ export default function Election() {
         <ModalContent>
           <ModalHeader>Create election</ModalHeader>
           <ModalCloseButton />
+
+          <form onSubmit={formik.handleSubmit}>
           <ModalBody pb={6}>
-            <FormControl>
-              <FormLabel>Election Name</FormLabel>
-              <Input ref={btnRef} placeholder="Eg: PRU Ke-14" required />
-            </FormControl>
+              <FormControl>
+                <FormLabel>Election Name</FormLabel>
+                <Input 
+                  ref={btnRef} 
+                  id="electionName"
+                  name="electionName"
+                  placeholder="Eg: PRU Ke-14" 
+                  required 
+                  value={formik.values.electionName}
+                  onChange={formik.handleChange}
+                  />
+              </FormControl>
 
-            <FormControl mt={4}>
-              <FormLabel>Start date</FormLabel>
-              <DatePicker
-                id="startDate"
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                showTimeSelect
-                dateFormat="dd/MM/yyyy h:mm aa"
-                minDate={new Date()}
-                required
-              />
-            </FormControl>
+              <FormControl mt={4}>
+                <FormLabel>Start date</FormLabel>
+                <DatePicker
+                  id="startDate"
+                  name="startDate"
+                  selected={startDate}
+                  onChange={(date) => setStartDate(date)}
+                  showTimeSelect
+                  dateFormat="dd/MM/yyyy h:mm aa"
+                  minDate={new Date()}
+                  required
+                />
+              </FormControl>
 
-            <FormControl mt={4}>
-              <FormLabel>End date</FormLabel>
-              <DatePicker
-                id="endDate"
-                selected={endDate}
-                onChange={(date) => setEndDate(date)}
-                showTimeSelect
-                dateFormat="dd/MM/yyyy h:mm aa"
-                minDate={startDate}
-                required
-              />
-            </FormControl>
+              <FormControl mt={4}>
+                <FormLabel>End date</FormLabel>
+                <DatePicker
+                  id="endDate"
+                  name="endDate"
+                  selected={endDate}
+                  onChange={(date) => setEndDate(date)}
+                  showTimeSelect
+                  dateFormat="dd/MM/yyyy h:mm aa"
+                  minDate={startDate}
+                  required
+                />
+              </FormControl>
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" mr={3}>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              type="submit"
+            >
               Save
             </Button>
             <Button onClick={onNewElectionModalClose}>Cancel</Button>
           </ModalFooter>
+
+          </form>
         </ModalContent>
       </Modal>
     </Flex>

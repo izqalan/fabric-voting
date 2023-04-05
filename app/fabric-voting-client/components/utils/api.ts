@@ -2,22 +2,21 @@
 
 export default class Api {
   url: string;
-
+  
   constructor(url: string) {
     this.url = url;
   }
 
   async get(path: string) {
-    const res = await fetch(`${this.url}${path}`);
+    const res = await fetch(`${this.url}${path}`, {
+      method: 'GET',
+    });
     return res.json();
   }
 
   async post(path: string, body: any) {
     const res = await fetch(`${this.url}${path}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(body),
     });
     return res.json();
@@ -26,9 +25,6 @@ export default class Api {
   async put(path: string, body: any) {
     const res = await fetch(`${this.url}${path}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(body),
     });
     return res.json();
