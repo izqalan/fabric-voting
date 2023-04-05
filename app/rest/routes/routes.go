@@ -66,6 +66,9 @@ func SetupRouter(contract *client.Contract) *gin.Engine {
 		v1.GET("/election/:electionID", func(c *gin.Context) {
 			getElectionById(contract, c)
 		})
+		v1.PUT("/election/:electionID", func(c *gin.Context) {
+			updateElection(contract, c)
+		})
 		v1.GET("/election", func(c *gin.Context) {
 			getAllElections(contract, c)
 		})
