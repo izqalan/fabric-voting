@@ -339,9 +339,19 @@ func (t *VotingChaincode) createCandidate(stub shim.ChaincodeStubInterface, args
 	faculty := args[3]
 	party := args[4]
 	avatar := args[5]
+
+	// check if candidate already exists
+	candidateAsBytes, err := stub.GetState(studentId)
+	if err != nil {
+		return shim.Error("Failed to get candidate: " + studentId)
+	}
+	if candidateAsBytes != nil {
+		return shim.Error("Candidate already exists: " + studentId)
+	}
+
 	var candidate = &candidate{Name: candidateName, Votes: 0, StudentID: studentId, ElectionID: electionId, Faculty: faculty, Party: party, Avatar: avatar}
-	candidateAsBytes, _ := json.Marshal(candidate)
-	err := stub.PutState(studentId, candidateAsBytes)
+	candidateAsBytes, _ = json.Marshal(candidate)
+	err = stub.PutState(studentId, candidateAsBytes)
 	if err != nil {
 		fmt.Println("Error creating candidate")
 		return shim.Error(err.Error())
