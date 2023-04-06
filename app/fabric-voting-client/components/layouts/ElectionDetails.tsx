@@ -110,7 +110,7 @@ export default function ElectionDetails({
       } else {
         // show error
         toast({
-          title: `Error: ${res.message}`,
+          title: `Error: ${res.error}`,
           status: "error",
           isClosable: true,
         });
