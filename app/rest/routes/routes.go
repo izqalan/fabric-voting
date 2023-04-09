@@ -343,9 +343,9 @@ func createVoter(contract *client.Contract, c *gin.Context) {
 
 	fmt.Printf("*** Transaction committed successfully\n")
 
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"message": "Voter created. Txn committed successfully.",
-		"status":  http.StatusOK,
+		"status":  http.StatusCreated,
 	})
 }
 
