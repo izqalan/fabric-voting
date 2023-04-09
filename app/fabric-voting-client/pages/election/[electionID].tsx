@@ -8,7 +8,7 @@ import {
   useRadioGroup,
   Input,
   Button,
-  Spacer,
+  useToast,
 } from "@chakra-ui/react";
 import Api from "@/components/utils/api";
 import { useEffect, useState } from "react";
@@ -23,6 +23,8 @@ export default function Election() {
   const { electionID } = router.query;
   const [electionInfo, setElectionInfo] = useState({});
   const [electionCandidates, setElectionCandidates] = useState([]);
+  const [voterId, setVoterId] = useState("");
+  const [candidateId, setCandidateId] = useState("");
 
   const { getRootProps, getRadioProps } = useRadioGroup({
     name: "candidate",
@@ -50,6 +52,23 @@ export default function Election() {
     fetchElectionInfo();
   }, [electionID]);
 
+  const toast = useToast();
+
+  const castVote = async (voterId: string, candidateId: string, electionId: string) => {
+    const res = await api.post(`/ballot/vote`, {
+      voterId: voterId,
+      candidateId: candidateId,
+      electionId: electionId,
+    });
+    if (res.status === 200) {
+      toast({
+        title: `${res.message}`,
+        status: "success",
+        isClosable: true,
+      });
+    }
+  };
+    
   return (
     <Flex
       direction={"column"}
@@ -107,8 +126,9 @@ export default function Election() {
 
       <Container>
         <Flex direction={"column"}>
-          <Input my={2} variant="outline" placeholder="Your ID" />
-          <Button my={2}>Cast vote</Button>
+          <Input onChange={(e) => setVoterId(e.target.value)} my={2} variant="outline" placeholder="Your ID" />
+          <Button onClick={() => castVote(voterId, candidateId, electionInfo.data.electionID)} my={2}>Cast vote</Button>
+          <Button variant={'solid'} bg={'purple.900'} border={'purple.600'} my={2}>Register to get a key</Button>
         </Flex>
       </Container>
     </Flex>
