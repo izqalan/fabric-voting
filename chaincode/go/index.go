@@ -15,13 +15,17 @@ type VotingChaincode struct {
 
 // init ledger with 4 voting cadidates
 type candidate struct {
-	Name      string   `json:"name"`
-	Votes     int      `json:"votes"`
-	StudentID string   `json:"studentID"`
-	Faculty   string   `json:"faculty"`
-	Party     string   `json:"party"`
-	Elections []string `json:"elections"`
-	Avatar    string   `json:"avatar"`
+	Name      string         `json:"name"`
+	StudentID string         `json:"studentID"`
+	Faculty   string         `json:"faculty"`
+	Party     string         `json:"party"`
+	Avatar    string         `json:"avatar"`
+	Elections []electionInfo `json:"elections"`
+}
+
+type electionInfo struct {
+	ElectionID string `json:"electionID"`
+	Votes      int    `json:"votes"`
 }
 
 // voter struct
@@ -73,8 +77,6 @@ func (t *VotingChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return t.createVoter(stub, args)
 	} else if function == "createCandidate" {
 		return t.createCandidate(stub, args)
-	} else if function == "getVoteCount" {
-		return t.getVoteCount(stub, args)
 	} else if function == "getElectionById" {
 		return t.getElectionById(stub, args)
 	} else if function == "getAllElections" {
@@ -93,9 +95,7 @@ func (t *VotingChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 // query function
 func (t *VotingChaincode) Query(stub shim.ChaincodeStubInterface) pb.Response {
 	function, args := stub.GetFunctionAndParameters()
-	if function == "getVoteCount" {
-		return t.getVoteCount(stub, args)
-	} else if function == "getElectionById" {
+	if function == "getElectionById" {
 		return t.getElectionById(stub, args)
 	} else if function == "getAllElections" {
 		return t.getAllElections(stub)
@@ -148,6 +148,7 @@ func (t *VotingChaincode) vote(stub shim.ChaincodeStubInterface, args []string) 
 	// check if voter has already voted
 	voterId := args[0]
 	candidateId := args[1]
+	electionId := args[2]
 
 	voterAsBytes, err := stub.GetState(voterId)
 	if err != nil {
@@ -158,79 +159,30 @@ func (t *VotingChaincode) vote(stub shim.ChaincodeStubInterface, args []string) 
 	if voter.HasVoted {
 		return shim.Error("Voter has already voted")
 	}
-	voter.HasVoted = true
-	voterAsBytes, _ = json.Marshal(voter)
-	stub.PutState(voterId, voterAsBytes)
 
-	// add vote to candidate
+	// update candidate votes
 	candidateAsBytes, err := stub.GetState(candidateId)
 	if err != nil {
 		return shim.Error("Failed to get candidate: " + candidateId)
 	}
 	candidate := candidate{}
 	json.Unmarshal(candidateAsBytes, &candidate)
-	candidate.Votes += 1
-	candidateAsBytes, _ = json.Marshal(candidate)
-	err = stub.PutState(candidateId, candidateAsBytes)
-
-	if err != nil {
-		fmt.Println("Error voting")
-		return shim.Error(err.Error())
+	contestedElection := candidate.Elections
+	for i := 0; i < len(contestedElection); i++ {
+		if contestedElection[i].ElectionID == electionId {
+			contestedElection[i].Votes++
+		}
 	}
+	candidate.Elections = contestedElection
+	candidateAsBytes, _ = json.Marshal(candidate)
 
-	fmt.Println(voterId + " Voted " + candidateId)
+	stub.PutState(candidateId, candidateAsBytes)
 
 	voter.HasVoted = true
 	voterAsBytes, _ = json.Marshal(voter)
-	err = stub.PutState(voterId, voterAsBytes)
-
-	if err != nil {
-		fmt.Println("Error flagging voter [HasVoted]")
-		return shim.Error(err.Error())
-	}
+	stub.PutState(voterId, voterAsBytes)
 
 	return shim.Success(nil)
-}
-
-// get vote count function
-func (t *VotingChaincode) getVoteCount(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	electionId := args[0]
-	candidateAsBytes, err := stub.GetState(electionId)
-	if err != nil {
-		return shim.Error("Failed to get candidate: " + electionId)
-	}
-	// get all candidates for election
-	candidates := []candidate{}
-	json.Unmarshal(candidateAsBytes, &candidates)
-
-	// get all voters for election
-	voters := []voter{}
-	votersAsBytes, err := stub.GetState(electionId)
-	if err != nil {
-		return shim.Error("Failed to get voter: " + electionId)
-	}
-	json.Unmarshal(votersAsBytes, &voters)
-
-	// get total votes
-	totalVotes := 0
-	for _, candidate := range candidates {
-		totalVotes += candidate.Votes
-	}
-
-	// get winner
-	winner := candidate{}
-	for _, candidate := range candidates {
-		if candidate.Votes > winner.Votes {
-			winner = candidate
-		}
-	}
-
-	// create election results
-	electionResults := electionResults{Candidates: candidates, Winner: winner}
-
-	// return election results
-	electionResultsAsBytes, _ := json.Marshal(electionResults)
-	return shim.Success(electionResultsAsBytes)
 }
 
 // get election by id function
@@ -324,7 +276,8 @@ func (t *VotingChaincode) createCandidate(stub shim.ChaincodeStubInterface, args
 		// if candidate exists, update candidate and append electionId to candidate.Elections
 		candidate := candidate{}
 		json.Unmarshal(candidateAsBytes, &candidate)
-		candidate.Elections = append(candidate.Elections, electionId)
+		info := electionInfo{ElectionID: electionId, Votes: 0}
+		candidate.Elections = append(candidate.Elections, info)
 		candidateAsBytes, _ := json.Marshal(candidate)
 		err := stub.PutState(studentId, candidateAsBytes)
 		if err != nil {
@@ -335,7 +288,8 @@ func (t *VotingChaincode) createCandidate(stub shim.ChaincodeStubInterface, args
 		return shim.Success(nil)
 	} else {
 		// else create candidate
-		candidate := candidate{StudentID: studentId, Name: candidateName, Faculty: faculty, Party: party, Avatar: avatar, Votes: 0, Elections: []string{electionId}}
+		info := electionInfo{ElectionID: electionId, Votes: 0}
+		candidate := candidate{StudentID: studentId, Name: candidateName, Faculty: faculty, Party: party, Avatar: avatar, Elections: []electionInfo{info}}
 		candidateAsBytes, _ := json.Marshal(candidate)
 		err := stub.PutState(studentId, candidateAsBytes)
 		if err != nil {
@@ -416,7 +370,10 @@ func (t *VotingChaincode) getCandidatesById(stub shim.ChaincodeStubInterface, ar
 		candidate := candidate{}
 		json.Unmarshal(candidateAsBytes, &candidate)
 		for _, election := range candidate.Elections {
-			if election == electionId {
+			if election.ElectionID == electionId {
+				if bArrayMemberAlreadyWritten == true {
+					buffer.WriteString(",")
+				}
 				buffer.WriteString(string(candidateAsBytes))
 				bArrayMemberAlreadyWritten = true
 			}
