@@ -101,7 +101,7 @@ export default function ElectionDetails({
       console.log(res);
       // check if response 201
       if (res.status === 201) {
-        onClose
+        onClose();
         toast({
           title: `${res.message}`,
           status: "success",
