@@ -37,14 +37,12 @@ export default function Election() {
     const fetchCandidates = async () => {
       const res = await api.get(`/candidate/${electionID}`);
       if (res.status === 200) {
-        console.log(res.data);
         setElectionCandidates(res.data);
       }
     };
     const fetchElectionInfo = async () => {
       const res = await api.get(`/election/${electionID}`);
       if (res.status === 200) {
-        console.log(res);
         setElectionInfo(res);
       }
     };
@@ -67,6 +65,10 @@ export default function Election() {
         isClosable: true,
       });
     }
+  };
+
+  const gotoRegister = () => {
+    router.push(`/register/${electionID}`);
   };
     
   return (
@@ -128,7 +130,7 @@ export default function Election() {
         <Flex direction={"column"}>
           <Input onChange={(e) => setVoterId(e.target.value)} my={2} variant="outline" placeholder="Your ID" />
           <Button onClick={() => castVote(voterId, candidateId, electionInfo.data.electionID)} my={2}>Cast vote</Button>
-          <Button variant={'solid'} bg={'purple.900'} border={'purple.600'} my={2}>Register to get a key</Button>
+          <Button onClick={gotoRegister} variant={'solid'} bg={'purple.900'} border={'purple.600'} my={2}>Register to get a key</Button>
         </Flex>
       </Container>
     </Flex>
