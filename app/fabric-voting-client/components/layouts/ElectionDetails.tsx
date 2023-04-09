@@ -71,13 +71,13 @@ export default function ElectionDetails({
   const btnRef = useRef();
   // this is just a mock data
   const BASE_URL = "http://localhost:3000";
-  const [candidates, setCandidates] = useState<any[]>();
+  const [candidates, setCandidates] = useState<any[]>([]);
   const toast = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
       const res = await api.get(`/candidate/${electionID}`);
-      console.log(res);
+      console.log(res.data);
       if (res.status === 200) {
         setCandidates(res.data);
       }
@@ -229,7 +229,7 @@ export default function ElectionDetails({
             <Tbody overflow="scroll" maxHeight="50vh">
               {!isEmpty(candidates) &&
                 candidates.map((candidate) => (
-                  <Tr key={candidate.studentID}>
+                  <Tr key={candidate.Key}>
                     <Td>
                       <HStack>
                         <Image
@@ -244,14 +244,14 @@ export default function ElectionDetails({
                             sm: "block",
                           }}
                           // avatar
-                          src={candidate.avatar}
+                          src={candidate.Record.avatar}
                           alt="avatar"
                         />
                         <Flex direction="column" justifyItems="start">
                           {/* name */}
-                          <Text fontWeight="600">{candidate.name}</Text>
+                          <Text fontWeight="600">{candidate.Record.name}</Text>
                           <Text size="sm" color="gray.500">
-                            @{candidate.name}
+                            @{candidate.Record.name}
                           </Text>
                         </Flex>
                       </HStack>
@@ -268,10 +268,10 @@ export default function ElectionDetails({
                         fontWeight="600"
                         rounded="full"
                       >
-                        {candidate.faculty}
+                        {candidate.Record.faculty}
                       </Text>
                     </Td>
-                    <Td>{candidate.party}</Td>
+                    <Td>{candidate.Record.party}</Td>
                     {/* <Td isNumeric>{candidate.votes}</Td> */}
                   </Tr>
                 ))}

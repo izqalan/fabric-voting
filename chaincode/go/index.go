@@ -362,10 +362,6 @@ func (t *VotingChaincode) getCandidatesById(stub shim.ChaincodeStubInterface, ar
 		if err != nil {
 			return shim.Error(err.Error())
 		}
-		// Add a comma before array members, suppress it for the first array member
-		if bArrayMemberAlreadyWritten {
-			buffer.WriteString(",")
-		}
 		candidateAsBytes, err := stub.GetState(queryResponse.Key)
 		if err != nil {
 			return shim.Error(err.Error())
@@ -377,16 +373,20 @@ func (t *VotingChaincode) getCandidatesById(stub shim.ChaincodeStubInterface, ar
 				if bArrayMemberAlreadyWritten {
 					buffer.WriteString(",")
 				}
+				buffer.WriteString("{\"Key\":")
+				buffer.WriteString("\"")
+				buffer.WriteString(queryResponse.Key)
+				buffer.WriteString("\"")
+
+				buffer.WriteString(", \"Record\":")
+				// Record is a JSON object, so we write as-is
 				buffer.WriteString(string(candidateAsBytes))
+				buffer.WriteString("}")
 				bArrayMemberAlreadyWritten = true
 			}
 		}
 	}
-	if bArrayMemberAlreadyWritten {
-		buffer.WriteString("]")
-	} else {
-		buffer.WriteString("[]")
-	}
+	buffer.WriteString("]")
 	return shim.Success(buffer.Bytes())
 }
 

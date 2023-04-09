@@ -110,13 +110,13 @@ export default function Election() {
         {!isEmpty(electionCandidates) && (
           <Flex direction={"row"} overflow={'scroll'} overflowWrap={'normal'}>
             {electionCandidates.map((candidate: any) => {
-              const radio = getRadioProps({ value: candidate.studentID });
+              const radio = getRadioProps({ value: candidate.Key });
 
               return (
-                <Box key={candidate.studentID} mr={2}>
-                  <RadioCard key={candidate.studentID} {...radio}>
+                <Box key={candidate.Key} mr={2}>
+                  <RadioCard key={candidate.Key} {...radio}>
                     <Image
-                      src={candidate.avatar}
+                      src={candidate.Record.avatar}
                       alt={candidate.name}
                       borderRadius={"lg"}
                       objectFit={"cover"}
@@ -125,10 +125,10 @@ export default function Election() {
                       w={["100px", "150px"]}
                     />
                     <Text fontWeight={"bold"} fontSize={"xl"}>
-                      {candidate.name}
+                      {candidate.Record.name}
                     </Text>
-                    <Text>Party: {candidate.party}</Text>
-                    <Text>Faculty: {candidate.faculty}</Text>
+                    <Text>Party: {candidate.Record.party}</Text>
+                    <Text>Faculty: {candidate.Record.faculty}</Text>
                   </RadioCard>
                 </Box>
               );
