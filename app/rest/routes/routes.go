@@ -231,12 +231,16 @@ func getElectionById(contract *client.Contract, c *gin.Context) {
 
 	fmt.Printf("*** Transaction result: %s\n", string(result))
 
-	r := string(result)
-	// out, _ := json.Marshal(string(r))
+	var response interface{}
+	err = json.Unmarshal(result, &response)
+	if err != nil {
+		c.JSON(http.StatusRequestTimeout, gin.H{"error": err.Error()})
+		panic(fmt.Errorf("failed to unmarshal JSON data: %w", err))
+	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Election fetched successfully.",
-		"data":    r,
+		"message": "Election fetched",
+		"data":    response,
 		"status":  http.StatusOK,
 	})
 }
