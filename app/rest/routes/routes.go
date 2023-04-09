@@ -11,6 +11,11 @@ import (
 	"github.com/hyperledger/fabric-gateway/pkg/client"
 )
 
+type newElectionValue struct {
+	Target string `json:"target"`
+	Value  string `json:"value"`
+}
+
 type candidate struct {
 	Name       string `json:"name"`
 	StudentID  string `json:"studentID"`
@@ -285,28 +290,22 @@ func getAllElections(contract *client.Contract, c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param electionID path string true "Election ID"
-// @Body  {object} election
+// @Body  {object} target, value
 // @Success 200 {string} string "Election updated"
 // @Router /election/{electionID} [put]
 func updateElection(contract *client.Contract, c *gin.Context) {
 	electionID := c.Param("electionID")
 
-	var election election
-	if err := c.ShouldBindJSON(&election); err != nil {
+	// the chaincode takes electionID, target field and new value
+	// eg updateElection(electionID, "electionName", "new election name")
+
+	var newElectionValue newElectionValue
+	if err := c.ShouldBindJSON(&newElectionValue); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// the chaincode takes in object of type election
-	// so we need to convert the election object to json
-	// and then pass it to the chaincode
-	electionJSON, err := json.Marshal(election)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		panic(fmt.Errorf("failed to marshal JSON data: %w", err))
-	}
-
-	_, err = contract.SubmitTransaction("updateElection", electionID, string(electionJSON))
+	_, err := contract.SubmitTransaction("updateElection", electionID, newElectionValue.Target, newElectionValue.Value)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		panic(fmt.Errorf("failed to submit transaction: %w", err))

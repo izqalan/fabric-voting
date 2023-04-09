@@ -118,6 +118,28 @@ export default function ElectionDetails({
     },
   });
 
+  const handleEndElection = async (electionID: string) => {
+    const payload = {
+      target: 'endDate',
+      value: new Date().toISOString()
+    }
+    const res = await api.put(`/election/${electionID}`, payload);
+    if (res.status === 200) {
+      toast({
+        title: `${res.message}`,
+        status: "success",
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: `Error`,
+        description: `${res.error}`,
+        status: "error",
+        isClosable: true,
+      });
+    }
+  };
+
   return (
     <Box
       bg={useColorModeValue("white", "gray.900")}
@@ -172,9 +194,13 @@ export default function ElectionDetails({
                 Actions
               </MenuButton>
               <MenuList>
-                <MenuItem>View Result</MenuItem>
                 {new Date() < endDate && (
-                  <MenuItem color={"red.500"}>End Election</MenuItem>
+                  <MenuItem 
+                    onClick={() => {
+                      handleEndElection(electionID);
+                    }
+                  }
+                  color={"red.500"}>End Election</MenuItem>
                 )}
               </MenuList>
             </Menu>
