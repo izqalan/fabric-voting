@@ -7,7 +7,6 @@ import {
   IconButton,
   HStack,
   Table,
-  TableCaption,
   TableContainer,
   Tbody,
   Td,
@@ -15,25 +14,10 @@ import {
   Thead,
   Tr,
   Image,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  useDisclosure,
-  InputGroup,
-  InputLeftAddon,
-  VStack,
 } from "@chakra-ui/react";
 import { format } from "date-fns";
 import { useRef, useEffect, useState } from "react";
-import { FiClipboard, FiUserPlus } from "react-icons/fi";
+import { FiClipboard } from "react-icons/fi";
 import copyMessage from "../utils/copyMessage";
 import Api from "../utils/api";
 
@@ -57,7 +41,6 @@ export default function ElectionDResult({
   const BASE_URL = "http://localhost:3000"
   const api = new Api();
   const [candidates, setCandidates] = useState<any>([]);
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const btnRef = useRef();
 
@@ -121,15 +104,6 @@ export default function ElectionDResult({
               Last updated at {format(updatedAt, "PPpp")}
             </Text>
           </Flex>
-          <IconButton
-            size="md"
-            colorScheme="purple"
-            variant="outline"
-            mx={3}
-            aria-label="copy eletion url"
-            icon={<FiUserPlus />}
-            onClick={onOpen}
-          />
         </Flex>
 
         <TableContainer>
@@ -198,49 +172,6 @@ export default function ElectionDResult({
             </Tbody>
           </Table>
         </TableContainer>
-
-        <Modal initialFocusRef={btnRef} isOpen={isOpen} onClose={onClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Add candidate</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody pb={6}>
-              <FormControl>
-                <FormLabel>Name</FormLabel>
-                <Input ref={btnRef} placeholder="First name" />
-              </FormControl>
-
-              <FormControl mt={4}>
-                <FormLabel>Faculty</FormLabel>
-                <Input placeholder="Faculty" />
-              </FormControl>
-
-              <FormControl mt={4}>
-                <FormLabel>Party</FormLabel>
-                <Input placeholder="Party" />
-              </FormControl>
-
-              <FormControl mt={4}>
-                <FormLabel>Faculty</FormLabel>
-                <Input placeholder="Faculty" />
-              </FormControl>
-
-              <InputGroup mt={4}>
-                <FormLabel>Profile picture</FormLabel>
-                {/* eslint-disable-next-line react/no-children-prop */}
-                <InputLeftAddon children="https://" />
-                <Input placeholder="remote image" />
-              </InputGroup>
-            </ModalBody>
-
-            <ModalFooter>
-              <Button colorScheme="blue" mr={3}>
-                Save
-              </Button>
-              <Button onClick={onClose}>Cancel</Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
       </Flex>
     </Box>
   );

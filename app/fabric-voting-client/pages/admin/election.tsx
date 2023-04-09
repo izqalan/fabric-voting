@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ElectionCard from "@/components/elements/electionCard";
 import ElectionDetails from "@/components/layouts/ElectionDetails";
-import { addDays, subDays, format, isValid } from "date-fns";
+import { addDays } from "date-fns";
 import {
   useDisclosure,
   Flex,
@@ -30,11 +30,6 @@ export default function Election() {
     isOpen: isNewElectionModalOpen,
     onOpen: onNewElectionModalOpen,
     onClose: onNewElectionModalClose,
-  } = useDisclosure();
-  const {
-    isOpen: isDatePickerOpen,
-    onOpen: onDatePickerOpen,
-    onClose: onDatePickerClose,
   } = useDisclosure();
   const btnRef = React.useRef(null);
 
@@ -98,20 +93,24 @@ export default function Election() {
         </Button>
         <Flex direction="column" overflow="scroll" maxHeight={"79vh"}>
           {!isEmpty(activeElections) &&
-            activeElections.map((election) => (
-              <ElectionCard
-                ref={btnRef}
-                key={election.Key}
-                electionName={election.Record.electionName}
-                electionID={election.Record.electionID}
-                startDate={new Date(election.Record.startDate)}
-                endDate={new Date(election.Record.endDate)}
-                createdAt={new Date(election.Record.createdAt)}
-                updatedAt={new Date(election.Record.updatedAt)}
-                style={{ marginBottom: 16 }}
-                onClick={() => setSelectedElection(election)}
-              />
-            ))}
+            activeElections.map((election) => {
+              if (new Date() < new Date(election.Record.endDate)) {
+                return (
+                  <ElectionCard
+                    ref={btnRef}
+                    key={election.Key}
+                    electionName={election.Record.electionName}
+                    electionID={election.Record.electionID}
+                    startDate={new Date(election.Record.startDate)}
+                    endDate={new Date(election.Record.endDate)}
+                    createdAt={new Date(election.Record.createdAt)}
+                    updatedAt={new Date(election.Record.updatedAt)}
+                    style={{ marginBottom: 16 }}
+                    onClick={() => setSelectedElection(election)}
+                  />
+                );
+              }
+            })}
         </Flex>
       </Flex>
       {!isEmpty(selectedElection) && (
