@@ -28,6 +28,8 @@ export default function ElectionCard({
   style
 }: ElectionCardProps) {
 
+  const BASE_URL = "http://localhost:3000";
+
   let candidates = [{
     avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
   }, {
@@ -84,7 +86,7 @@ export default function ElectionCard({
             aria-label="copy eletion url"
             icon={<FiClipboard />}
             onClick={() => {
-              copyMessage(`http://localhost:3000/election/${electionID}`)
+              copyMessage(`${BASE_URL}/election/${electionID}`)
             }}
           />
           <Text

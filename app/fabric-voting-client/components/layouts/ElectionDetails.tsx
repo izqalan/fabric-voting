@@ -70,7 +70,7 @@ export default function ElectionDetails({
   const api = new Api();
   const btnRef = useRef();
   // this is just a mock data
-
+  const BASE_URL = "http://localhost:3000";
   const [candidates, setCandidates] = useState<any[]>();
   const toast = useToast();
 
@@ -151,7 +151,7 @@ export default function ElectionDetails({
             aria-label="copy eletion url"
             icon={<FiClipboard />}
             onClick={() => {
-              copyMessage(electionID);
+              copyMessage(`${BASE_URL}/election/${electionID}`);
             }}
           />
         </Flex>
