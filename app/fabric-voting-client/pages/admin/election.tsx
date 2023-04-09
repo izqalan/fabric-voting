@@ -46,7 +46,6 @@ export default function Election() {
   useEffect(() => {
     const fetchData = async () => {
       const res = await api.get("/election");
-      console.log(res);
       if (res.status === 200) {
         setActiveElections(res.data);
       }

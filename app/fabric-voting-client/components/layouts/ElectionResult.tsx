@@ -32,9 +32,10 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { format } from "date-fns";
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { FiClipboard, FiUserPlus } from "react-icons/fi";
 import copyMessage from "../utils/copyMessage";
+import Api from "../utils/api";
 
 interface ElectionResultProps {
   electionName: string;
@@ -53,40 +54,23 @@ export default function ElectionDResult({
   createdAt,
   updatedAt,
 }: ElectionResultProps) {
+  const BASE_URL = "http://localhost:3000"
+  const api = new Api();
+  const [candidates, setCandidates] = useState<any>([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const btnRef = useRef();
 
-  // this is just a mock data
-  const candidates = [
-    {
-      studentID: "candidate.999",
-      name: "Jane Doe",
-      avatar:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
-      faculty: "FTSM",
-      party: "Gang Biru",
-      votes: 389,
-    },
-    {
-      studentID: "candidate.888",
-      name: "Arman Duplantis",
-      avatar:
-        "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80",
-      faculty: "FSSK",
-      party: "Gang Merah",
-      votes: 1093,
-    },
-    {
-      studentID: "candidate.777",
-      name: "Some guy",
-      avatar:
-        "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=761&q=80",
-      faculty: "FPEND",
-      party: "Gang Kuning",
-      votes: 3,
-    },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await api.get(`/candidate/${electionID}`);
+      console.log(res);
+      if (res.status === 200) {
+        setCandidates(res.data);
+      }
+    };
+    fetchData();
+  }, [electionID]);
 
   return (
     <Box
@@ -122,7 +106,7 @@ export default function ElectionDResult({
             aria-label="copy eletion url"
             icon={<FiClipboard />}
             onClick={() => {
-              copyMessage(electionID);
+              copyMessage(`${BASE_URL}/election/result/${electionID}`);
             }}
           />
         </Flex>
@@ -159,7 +143,7 @@ export default function ElectionDResult({
               </Tr>
             </Thead>
             <Tbody overflow="scroll" maxHeight="50vh">
-              {candidates.map((candidate) => (
+              {candidates.map((candidate: any) => (
                 <Tr key={candidate.studentID}>
                   <Td>
                     <HStack>
@@ -203,7 +187,12 @@ export default function ElectionDResult({
                     </Text>
                   </Td>
                   <Td>{candidate.party}</Td>
-                  <Td isNumeric>{candidate.votes}</Td>
+                  {candidate.elections.map((election: any) => {
+                    if (election.electionID === electionID) {
+                      return (
+                        <Td key={'votes'} isNumeric>{election.votes}</Td>
+                      );
+                  }})}
                 </Tr>
               ))}
             </Tbody>
