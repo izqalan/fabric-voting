@@ -37,6 +37,7 @@ type voter struct {
 type vote struct {
 	VoterID     string `json:"voterID"`
 	CandidateID string `json:"candidateID"`
+	ElectionID  string `json:"electionID"`
 }
 
 func SetupRouter(contract *client.Contract) *gin.Engine {
@@ -364,8 +365,7 @@ func castVote(contract *client.Contract, c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	_, err := contract.SubmitTransaction("vote", vote.VoterID, vote.CandidateID)
+	_, err := contract.SubmitTransaction("vote", vote.VoterID, vote.CandidateID, vote.ElectionID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		panic(fmt.Errorf("failed to submit transaction: %w", err))

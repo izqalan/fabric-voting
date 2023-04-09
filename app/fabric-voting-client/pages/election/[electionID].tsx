@@ -28,7 +28,7 @@ export default function Election() {
 
   const { getRootProps, getRadioProps } = useRadioGroup({
     name: "candidate",
-    onChange: console.log,
+    onChange: (value) => setCandidateId(value),
   });
 
   const group = getRootProps();
@@ -53,15 +53,26 @@ export default function Election() {
   const toast = useToast();
 
   const castVote = async (voterId: string, candidateId: string, electionId: string) => {
-    const res = await api.post(`/ballot/vote`, {
-      voterId: voterId,
-      candidateId: candidateId,
-      electionId: electionId,
-    });
+    const payload = {
+      voterID: voterId,
+      candidateID: candidateId,
+      electionID: electionId,
+    }
+
+    console.log(payload);
+    
+    const res = await api.post(`/ballot/vote`, payload);
     if (res.status === 200) {
       toast({
         title: `${res.message}`,
         status: "success",
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: `error`,
+        description: res.error,
+        status: "error",
         isClosable: true,
       });
     }
