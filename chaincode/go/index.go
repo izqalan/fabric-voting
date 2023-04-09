@@ -126,9 +126,12 @@ func (t *VotingChaincode) createVoter(stub shim.ChaincodeStubInterface, args []s
 		return shim.Error("Failed to get voter: " + studentId)
 	}
 	dupeVoter := voter{}
-	json.Unmarshal(dupeVoterAsBytes, &dupeVoter)
-	if dupeVoter.StudentID != "" {
-		return shim.Error("Voter already registered")
+	// if voter exists, return error
+	if dupeVoterAsBytes != nil {
+		json.Unmarshal(dupeVoterAsBytes, &dupeVoter)
+		if dupeVoter.StudentID == studentId {
+			return shim.Error("Voter already exists")
+		}
 	}
 
 	newVoterAsBytes, _ := json.Marshal(newVoter)
