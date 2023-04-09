@@ -363,7 +363,7 @@ func (t *VotingChaincode) getCandidatesById(stub shim.ChaincodeStubInterface, ar
 			return shim.Error(err.Error())
 		}
 		// Add a comma before array members, suppress it for the first array member
-		if bArrayMemberAlreadyWritten == true {
+		if bArrayMemberAlreadyWritten {
 			buffer.WriteString(",")
 		}
 		candidateAsBytes, err := stub.GetState(queryResponse.Key)
@@ -374,7 +374,7 @@ func (t *VotingChaincode) getCandidatesById(stub shim.ChaincodeStubInterface, ar
 		json.Unmarshal(candidateAsBytes, &candidate)
 		for _, election := range candidate.Elections {
 			if election.ElectionID == electionId {
-				if bArrayMemberAlreadyWritten == true {
+				if bArrayMemberAlreadyWritten {
 					buffer.WriteString(",")
 				}
 				buffer.WriteString(string(candidateAsBytes))
@@ -382,7 +382,11 @@ func (t *VotingChaincode) getCandidatesById(stub shim.ChaincodeStubInterface, ar
 			}
 		}
 	}
-	buffer.WriteString("]")
+	if bArrayMemberAlreadyWritten {
+		buffer.WriteString("]")
+	} else {
+		buffer.WriteString("[]")
+	}
 	return shim.Success(buffer.Bytes())
 }
 
