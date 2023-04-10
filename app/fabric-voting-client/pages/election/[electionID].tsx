@@ -59,7 +59,16 @@ export default function Election() {
       electionID: electionId,
     }
 
-    console.log(payload);
+    // check if payload is empty
+    if (isEmpty(payload.voterID) || isEmpty(payload.candidateID) || isEmpty(payload.electionID)) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields and select a candidate",
+        status: "error",
+        isClosable: true,
+      });
+      return;
+    }
     
     const res = await api.post(`/ballot/vote`, payload);
     if (res.status === 200) {
@@ -139,7 +148,7 @@ export default function Election() {
 
       <Container>
         <Flex direction={"column"}>
-          <Input onChange={(e) => setVoterId(e.target.value)} my={2} variant="outline" placeholder="Your ID" />
+          <Input onChange={(e) => setVoterId(e.target.value)} my={2} required variant="outline" placeholder="Your ID" />
           <Button onClick={() => castVote(voterId, candidateId, electionInfo.data.electionID)} my={2}>Cast vote</Button>
           <Button onClick={gotoRegister} variant={'solid'} bg={'purple.900'} border={'purple.600'} my={2}>Register to get a key</Button>
         </Flex>

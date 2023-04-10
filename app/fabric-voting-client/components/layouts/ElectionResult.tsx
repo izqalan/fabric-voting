@@ -118,7 +118,7 @@ export default function ElectionDResult({
             </Thead>
             <Tbody overflow="scroll" maxHeight="50vh">
               {candidates.map((candidate: any) => (
-                <Tr key={candidate.studentID}>
+                <Tr key={candidate.Key}>
                   <Td>
                     <HStack>
                       <Image
@@ -133,14 +133,14 @@ export default function ElectionDResult({
                           sm: "block",
                         }}
                         // avatar
-                        src={candidate.avatar}
+                        src={candidate.Record.avatar}
                         alt="avatar"
                       />
                       <Flex direction="column" justifyItems="start">
                         {/* name */}
-                        <Text fontWeight="600">{candidate.name}</Text>
+                        <Text fontWeight="600">{candidate.Record.name}</Text>
                         <Text size="sm" color="gray.500">
-                          @{candidate.name}
+                          @{candidate.Record.name}
                         </Text>
                       </Flex>
                     </HStack>
@@ -157,11 +157,11 @@ export default function ElectionDResult({
                       fontWeight="600"
                       rounded="full"
                     >
-                      {candidate.faculty}
+                      {candidate.Record.faculty}
                     </Text>
                   </Td>
-                  <Td>{candidate.party}</Td>
-                  {candidate.elections.map((election: any) => {
+                  <Td>{candidate.Record.party}</Td>
+                  {candidate.Record.elections.map((election: any) => {
                     if (election.electionID === electionID) {
                       return (
                         <Td key={'votes'} isNumeric>{election.votes}</Td>
