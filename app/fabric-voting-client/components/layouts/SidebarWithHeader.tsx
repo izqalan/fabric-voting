@@ -229,7 +229,12 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               <MenuItem>Settings</MenuItem>
               <MenuItem>Billing</MenuItem>
               <MenuDivider />
-              <MenuItem>Sign out</MenuItem>
+              <MenuItem onClick={
+                () => {
+                  // auth0 signout
+                  window.location.href = '/api/auth/logout'
+                }
+              }>Sign out</MenuItem>
             </MenuList>
           </Menu>
         </Flex>
@@ -237,4 +242,3 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
     </Flex>
   );
 };
-

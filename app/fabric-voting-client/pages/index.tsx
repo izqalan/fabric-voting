@@ -9,10 +9,22 @@ import {
   Text,
   useBreakpointValue,
 } from '@chakra-ui/react';
+import { useRouter } from 'next/router'
+import { useUser } from '@auth0/nextjs-auth0/client'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
+  const { user, error, isLoading } = useUser();
+  const router = useRouter();
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>{error.message}</div>;
+
+  if (user) {
+    router.push("/admin");
+    return <div>Loading...</div>;
+  }
   return (
     <>
       <Head>
@@ -56,7 +68,14 @@ export default function Home() {
               color={'white'}
               _hover={{
                 bg: 'blue.500',
-              }}>
+              }}
+              onClick={
+                () => {
+                  // go to /api/auth/login
+                  window.location.href = '/api/auth/login'
+                }
+              }
+              >
               Create Project
             </Button>
             <Button rounded={'full'}>How It Works</Button>
