@@ -36,6 +36,16 @@ type voter struct {
 	Email      string `json:"email"`
 }
 
+type voterV2 struct {
+	ID                  string                `json:"id"`
+	ElectionEligibility []ElectionEligibility `json:"electionEligibility"`
+}
+
+type ElectionEligibility struct {
+	ElectionID string `json:"electionID"`
+	HasVoted   bool   `json:"hasVoted"`
+}
+
 type election struct {
 	ElectionID   string  `json:"electionID"`
 	ElectionName string  `json:"electionName"`
@@ -71,6 +81,8 @@ func (t *VotingChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return t.Init(stub)
 	} else if function == "vote" {
 		return t.vote(stub, args)
+	} else if function == "voteV2" {
+		return t.voteV2(stub, args)
 	} else if function == "createElection" {
 		return t.createElection(stub, args)
 	} else if function == "createVoter" {
@@ -184,6 +196,93 @@ func (t *VotingChaincode) vote(stub shim.ChaincodeStubInterface, args []string) 
 	voter.HasVoted = true
 	voterAsBytes, _ = json.Marshal(voter)
 	stub.PutState(voterId, voterAsBytes)
+
+	return shim.Success(nil)
+}
+
+// TODO: vote function v2, takes in generated id and email from pg, and CandidateID and ElectionID
+// when vote is casted, the generated id is stored in the ledger
+// if the generated id is found in the ledger, chek if election id exist (this means the voter has voted for this election
+// if generated id is not found in the ledger, create new voter and store in ledger
+// if generated id is found in the ledger, but election id is not found, update the voter and store in ledger
+// this means we need a new voter model, the current can only store one election id
+// and its checked using hasVoted flag.
+func (t *VotingChaincode) voteV2(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	Id := args[0]
+	CandidateID := args[1]
+	ElectionID := args[2]
+
+	if len(args) != 3 {
+		return shim.Error("Incorrect number of arguments. Expecting 3")
+	}
+	VoterID := "voter." + Id
+	// find voter in ledger
+	voterAsBytes, err := stub.GetState(VoterID)
+	if err != nil {
+		return shim.Error("Failed to get voter: " + VoterID)
+	}
+
+	// update candidate votes
+	candidateAsBytes, err := stub.GetState(CandidateID)
+	if err != nil {
+		return shim.Error("Failed to get candidate: " + CandidateID)
+	}
+	candidate := candidate{}
+	json.Unmarshal(candidateAsBytes, &candidate)
+	contestedElection := candidate.Elections
+	for i := 0; i < len(contestedElection); i++ {
+		fmt.Println(contestedElection[i].ElectionID)
+		if contestedElection[i].ElectionID == ElectionID {
+			contestedElection[i].Votes++
+		}
+	}
+	candidate.Elections = contestedElection
+	candidateAsBytes, _ = json.Marshal(candidate)
+	// candidate votes ledger updated when
+
+	// if voter does not exist, create new voter using voterV2 model
+	if voterAsBytes == nil {
+		electionEligibility := ElectionEligibility{ElectionID: ElectionID, HasVoted: true}
+		var newVoter = voterV2{ID: VoterID, ElectionEligibility: []ElectionEligibility{electionEligibility}}
+		newVoterAsBytes, _ := json.Marshal(newVoter)
+		err = stub.PutState(CandidateID, candidateAsBytes)
+		if err != nil {
+			fmt.Println("Error creating candidate")
+			return shim.Error(err.Error())
+		}
+		err = stub.PutState(VoterID, newVoterAsBytes)
+		if err != nil {
+			fmt.Println("Error creating voter")
+			return shim.Error(err.Error())
+		}
+
+	} else {
+		// if voter exists, update the voter election id
+		voter := voterV2{}
+		json.Unmarshal(voterAsBytes, &voter)
+
+		// check if election id already exist in voter election eligibility
+		for i := 0; i < len(voter.ElectionEligibility); i++ {
+			if voter.ElectionEligibility[i].ElectionID == ElectionID && voter.ElectionEligibility[i].HasVoted {
+				return shim.Error("Voter has already voted for this election")
+			} else {
+				voter.ElectionEligibility[i].HasVoted = true
+			}
+		}
+
+		voterAsBytes, _ = json.Marshal(voter)
+		err = stub.PutState(CandidateID, candidateAsBytes)
+		if err != nil {
+			fmt.Println("Error updating candidate")
+			return shim.Error(err.Error())
+		}
+		err = stub.PutState(VoterID, voterAsBytes)
+		if err != nil {
+			fmt.Println("Error updating voter")
+			return shim.Error(err.Error())
+		}
+
+	}
 
 	return shim.Success(nil)
 }

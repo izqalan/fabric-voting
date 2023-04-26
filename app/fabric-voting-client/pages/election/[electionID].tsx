@@ -23,7 +23,8 @@ export default function Election() {
   const { electionID } = router.query;
   const [electionInfo, setElectionInfo] = useState({});
   const [electionCandidates, setElectionCandidates] = useState([]);
-  const [voterId, setVoterId] = useState("");
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [candidateId, setCandidateId] = useState("");
 
   const { getRootProps, getRadioProps } = useRadioGroup({
@@ -52,15 +53,17 @@ export default function Election() {
 
   const toast = useToast();
 
-  const castVote = async (voterId: string, candidateId: string, electionId: string) => {
+  const castVote = async (email: string, password: string, candidateId: string, electionId: string) => {
+    const apiV2 = new Api("http://localhost:8081/api/v2");
     const payload = {
-      voterID: voterId,
+      email: email,
+      password: password,
       candidateID: candidateId,
       electionID: electionId,
     }
 
     // check if payload is empty
-    if (isEmpty(payload.voterID) || isEmpty(payload.candidateID) || isEmpty(payload.electionID)) {
+    if (isEmpty(payload.candidateID) || isEmpty(payload.electionID)) {
       toast({
         title: "Error",
         description: "Please fill in all fields and select a candidate",
@@ -70,7 +73,7 @@ export default function Election() {
       return;
     }
     
-    const res = await api.post(`/ballot/vote`, payload);
+    const res = await apiV2.post(`/ballot/vote`, payload);
     if (res.status === 200) {
       toast({
         title: `${res.message}`,
@@ -148,9 +151,9 @@ export default function Election() {
 
       <Container>
         <Flex direction={"column"}>
-          <Input onChange={(e) => setVoterId(e.target.value)} my={2} required variant="outline" placeholder="Your ID" />
-          <Button onClick={() => castVote(voterId, candidateId, electionInfo.data.electionID)} my={2}>Cast vote</Button>
-          <Button onClick={gotoRegister} variant={'solid'} bg={'purple.900'} border={'purple.600'} my={2}>Register to get a key</Button>
+          <Input onChange={(e) => setEmail(e.target.value)} my={2} required variant="outline" placeholder="siswa email" type="email"/>
+          <Input onChange={(e) => setPassword(e.target.value)} my={2} required variant="outline" placeholder="password" type="password"/>
+          <Button onClick={() => castVote(email, password, candidateId, electionInfo.data.electionID)} my={2}>Cast vote</Button>
         </Flex>
       </Container>
     </Flex>

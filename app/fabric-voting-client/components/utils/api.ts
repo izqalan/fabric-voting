@@ -3,6 +3,13 @@
 export default class Api {
   url = 'http://localhost:8081/api/v1';
 
+  //constructor that takes in a url, url is optional
+  constructor(url?: string) {
+    if (url) {
+      this.url = url;
+    }
+  }
+
   async get(path: string) {
     const res = await fetch(`${this.url}${path}`, {
       method: 'GET',

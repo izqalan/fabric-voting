@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/go-pg/pg/v10"
 	"github.com/hyperledger/fabric-gateway/pkg/client"
 )
 
@@ -41,6 +43,13 @@ type voter struct {
 
 type vote struct {
 	VoterID     string `json:"voterID"`
+	CandidateID string `json:"candidateID"`
+	ElectionID  string `json:"electionID"`
+}
+
+type voteV2 struct {
+	Email       string `json:"email"`
+	Password    string `json:"password"`
 	CandidateID string `json:"candidateID"`
 	ElectionID  string `json:"electionID"`
 }
@@ -81,10 +90,19 @@ func SetupRouter(contract *client.Contract) *gin.Engine {
 		v1.POST("/voter", func(c *gin.Context) {
 			createVoter(contract, c)
 		})
+		v1.GET("/voters", func(c *gin.Context) {
+			getAllVoters(contract, c)
+		})
 		v1.POST("/ballot/vote", func(c *gin.Context) {
 			castVote(contract, c)
 		})
 
+	}
+	v2 := r.Group("/api/v2")
+	{
+		v2.POST("/ballot/vote", func(c *gin.Context) {
+			castVoteV2(contract, c)
+		})
 	}
 	return r
 }
@@ -283,6 +301,38 @@ func getAllElections(contract *client.Contract, c *gin.Context) {
 
 }
 
+// @Summary Get All Voters
+// @Description Get all voters
+// @Tags Election
+// @Accept  json
+// @Produce  json
+// @Success 200 {string} string "Elections fetched"
+// @Router /voters [get]
+func getAllVoters(contract *client.Contract, c *gin.Context) {
+	// get all elections using queryByRange function chaincode
+	result, err := contract.EvaluateTransaction("queryByRange", "voter.", "voter.z")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		panic(fmt.Errorf("failed to query transaction: %w", err))
+	}
+
+	fmt.Printf("*** Transaction result: %s\n", string(result))
+
+	var response interface{}
+	err = json.Unmarshal(result, &response)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		panic(fmt.Errorf("failed to unmarshal JSON data: %w", err))
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Elections fetched successfully.",
+		"data":    response,
+		"status":  http.StatusOK,
+	})
+
+}
+
 // update election
 // @Summary Update Election
 // @Description Update election by electionID
@@ -376,4 +426,77 @@ func castVote(contract *client.Contract, c *gin.Context) {
 		"message": "Vote casted. Txn committed successfully.",
 		"status":  http.StatusOK,
 	})
+}
+
+// @Summary vote v2
+// @Description vote for a candidate
+// @Tags Ballot
+// @Accept  json
+// @Produce  json
+// @Body  {object} voterEmail, password, candidateID, ElectionID
+// @Success 200 {string} string "Vote casted"
+func castVoteV2(contract *client.Contract, c *gin.Context) {
+
+	var voteV2 voteV2
+	if err := c.ShouldBindJSON(&voteV2); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// connect pgsql
+	db := pg.Connect(&pg.Options{
+		Addr:     ":5432",
+		User:     "postgres",
+		Password: "admin",
+		Database: "fabric-voting-users",
+	})
+
+	// if connection fails
+	if db == nil {
+		fmt.Println("Error connecting to database")
+	}
+
+	// get user with email and salted password
+	type user struct {
+		tableName struct{} `pg:"auth.users"`
+		Email     string
+		Password  string
+		Id        int
+		Faculty   string
+	}
+
+	// unsalt password using pgcrypto
+	var u user
+	err := db.Model(&u).
+		Where("email = ?", voteV2.Email).
+		Where("password = crypt(?, password)", voteV2.Password).
+		Select()
+
+	if err != nil {
+		// return error message wrong email or password
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":  "Wrong email or password.",
+			"status": http.StatusBadRequest,
+		})
+		return
+	}
+
+	userID := strconv.Itoa(u.Id)
+	fmt.Println(voteV2.CandidateID, voteV2.ElectionID, userID)
+
+	// run chaincode ballot v2 here
+	_, err = contract.SubmitTransaction("voteV2", userID, voteV2.CandidateID, voteV2.ElectionID)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		panic(fmt.Errorf("failed to submit transaction: %w", err))
+	}
+
+	fmt.Printf("*** Transaction committed successfully\n")
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Vote casted. Txn committed successfully.",
+		"status":  http.StatusOK,
+	})
+
 }
