@@ -34,7 +34,8 @@ import {
   Menu,
   MenuButton,
   MenuList,
-  useToast
+  useToast,
+  InputRightElement
 } from "@chakra-ui/react";
 import { format } from "date-fns";
 import { useRef, useEffect, useState } from "react";
@@ -299,6 +300,7 @@ export default function ElectionDetails({
                   <FormLabel>Name</FormLabel>
                   <Input
                     name="name"
+                    required
                     ref={btnRef}
                     placeholder="Name"
                     value={formik.values.name}
@@ -310,6 +312,7 @@ export default function ElectionDetails({
                   <FormLabel>Student ID</FormLabel>
                   <Input
                     name="studentId"
+                    required
                     placeholder="Faculty"
                     value={formik.values.studentId}
                     onChange={formik.handleChange}
@@ -320,6 +323,7 @@ export default function ElectionDetails({
                   <FormLabel>Party</FormLabel>
                   <Input
                     name="party"
+                    required
                     placeholder="Party"
                     value={formik.values.party}
                     onChange={formik.handleChange}
@@ -330,6 +334,7 @@ export default function ElectionDetails({
                   <FormLabel>Faculty</FormLabel>
                   <Input
                     name="faculty"
+                    required
                     placeholder="Faculty"
                     value={formik.values.faculty}
                     onChange={formik.handleChange}
@@ -342,10 +347,29 @@ export default function ElectionDetails({
                   <InputLeftAddon children="https://" />
                   <Input
                     name="avatar"
+                    required
                     placeholder="remote image"
                     value={formik.values.avatar}
                     onChange={formik.handleChange}
                   />
+                  {formik.values.avatar && (
+                      <Image
+                      ml={2}
+                      w={10}
+                      h={10}
+                      rounded="lg"
+                      fit="cover"
+                      border="1px"
+                      borderColor="white"
+                      display={{
+                        base: "none",
+                        sm: "block",
+                      }}
+                      // avatar
+                      src={formik.values.avatar}
+                      alt="avatar"
+                    />
+                  )}
                 </InputGroup>
               </ModalBody>
 
