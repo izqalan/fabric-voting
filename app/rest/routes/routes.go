@@ -72,6 +72,9 @@ func SetupRouter(contract *client.Contract) *gin.Engine {
 		v1.POST("/candidate", func(c *gin.Context) {
 			createCandidate(contract, c)
 		})
+		v1.GET("/candidate", func(c *gin.Context) {
+			getAllCandidates(contract, c)
+		})
 		v1.GET("/candidate/:electionID", func(c *gin.Context) {
 			getCandidatesByElectionId(contract, c)
 		})
@@ -161,6 +164,36 @@ func createCandidate(contract *client.Contract, c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Candidate created. Txn committed successfully.",
 		"status":  http.StatusCreated,
+	})
+}
+
+// @Summary Get all Candidates
+// @Description Get all candidates
+// @Tags Candidate
+// @Accept  json
+// @Produce  json
+// @Success 200 {string} string "Candidates fetched"
+// @Router /candidate [get]
+func getAllCandidates(contract *client.Contract, c *gin.Context) {
+	result, err := contract.EvaluateTransaction("queryByRange", "candidate.", "candidate.z")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		panic(fmt.Errorf("failed to evaluate transaction: %w", err))
+	}
+
+	fmt.Printf("*** Transaction result: %s\n", string(result))
+
+	var response interface{}
+	err = json.Unmarshal(result, &response)
+	if err != nil {
+		c.JSON(http.StatusRequestTimeout, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Candidates fetched",
+		"status":  http.StatusOK,
+		"data":    response,
 	})
 }
 

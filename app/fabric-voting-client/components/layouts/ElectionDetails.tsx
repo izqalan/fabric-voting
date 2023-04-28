@@ -35,7 +35,8 @@ import {
   MenuButton,
   MenuList,
   useToast,
-  InputRightElement
+  Select,
+  Divider,
 } from "@chakra-ui/react";
 import { format } from "date-fns";
 import { useRef, useEffect, useState } from "react";
@@ -73,6 +74,7 @@ export default function ElectionDetails({
   // this is just a mock data
   const BASE_URL = "http://localhost:3000";
   const [candidates, setCandidates] = useState<any[]>([]);
+  const [registeredCandidates, setRegisteredCandidates] = useState<any[]>([]);
   const toast = useToast();
 
   useEffect(() => {
@@ -83,7 +85,14 @@ export default function ElectionDetails({
         setCandidates(res.data);
       }
     };
+    const fetchCandidates = async () => {
+      const res = await api.get(`/candidate`);
+      if (res.status === 200) {
+        setRegisteredCandidates(res.data);
+      }
+    };
     fetchData();
+    fetchCandidates();
   }, [electionID]);
 
   const formik = useFormik({
@@ -121,9 +130,9 @@ export default function ElectionDetails({
 
   const handleEndElection = async (electionID: string) => {
     const payload = {
-      target: 'endDate',
-      value: new Date().toISOString()
-    }
+      target: "endDate",
+      value: new Date().toISOString(),
+    };
     const res = await api.put(`/election/${electionID}`, payload);
     if (res.status === 200) {
       toast({
@@ -139,6 +148,32 @@ export default function ElectionDetails({
         isClosable: true,
       });
     }
+  };
+
+  const handleSelectCandidate = async (candidate: any) => {
+
+    if (isEmpty(candidate.target.value)) {
+      formik.setValues({
+        name: "",
+        studentId: "",
+        faculty: "",
+        party: "",
+        avatar: "",
+      });
+      return;
+    } 
+
+    candidate = registeredCandidates[candidate.target.value].Record;
+
+    // update formik values
+    formik.setValues({
+      name: candidate.name,
+      studentId: candidate.studentID.replace("candidate.", ""),
+      faculty: candidate.faculty,
+      party: candidate.party,
+      avatar: candidate.avatar,
+    });
+
   };
 
   return (
@@ -158,13 +193,23 @@ export default function ElectionDetails({
             h={"fit-content"}
             px={3}
             py={1}
-            bg={new Date() > endDate ? "red.400" : new Date() < startDate ? "purple.500" : "green.400" }
+            bg={
+              new Date() > endDate
+                ? "red.400"
+                : new Date() < startDate
+                ? "purple.500"
+                : "green.400"
+            }
             color="gray.100"
             fontSize="sm"
             fontWeight="700"
             rounded="md"
           >
-            {new Date() > endDate ? "Ended" : new Date() < startDate ? "Upcoming" : "Ongoing"}
+            {new Date() > endDate
+              ? "Ended"
+              : new Date() < startDate
+              ? "Upcoming"
+              : "Ongoing"}
           </Text>
           <IconButton
             size="md"
@@ -196,12 +241,14 @@ export default function ElectionDetails({
               </MenuButton>
               <MenuList>
                 {new Date() < endDate && (
-                  <MenuItem 
+                  <MenuItem
                     onClick={() => {
                       handleEndElection(electionID);
-                    }
-                  }
-                  color={"red.500"}>End Election</MenuItem>
+                    }}
+                    color={"red.500"}
+                  >
+                    End Election
+                  </MenuItem>
                 )}
               </MenuList>
             </Menu>
@@ -279,11 +326,7 @@ export default function ElectionDetails({
             </Tbody>
           </Table>
           {isEmpty(candidates) && (
-            <Flex
-              py={'4'}
-              justifyContent={"center"}
-              justifyItems={"center"}
-            >
+            <Flex py={"4"} justifyContent={"center"} justifyItems={"center"}>
               <Text>There are no candidates, start adding now.</Text>
             </Flex>
           )}
@@ -296,6 +339,31 @@ export default function ElectionDetails({
             <ModalCloseButton />
             <form onSubmit={formik.handleSubmit}>
               <ModalBody pb={6}>
+                <FormControl>
+                  <FormLabel>Choose Existing candidates</FormLabel>
+                  <Select placeholder="Select candidate" 
+                    onChange={(e) => {
+                      handleSelectCandidate(e);
+                    }}
+                  >
+                    {isEmpty(registeredCandidates) ? (
+                      <option value="none">No candidates</option>
+                    ) : (
+                      registeredCandidates.map((candidate, index) => (
+                        <option key={index} value={index}>
+                          {candidate.Record.name} ({candidate.Record.faculty})
+                        </option>
+                      ))
+                    )}
+                  </Select>
+                </FormControl>
+                <Flex py={4} alignItems={'center'} justifyItems={'center'}>
+                  <Divider orientation="horizontal" />
+                  <Text px={3} color="gray.500">
+                    or
+                  </Text>
+                  <Divider orientation="horizontal" />
+                </Flex>
                 <FormControl>
                   <FormLabel>Name</FormLabel>
                   <Input
@@ -353,7 +421,7 @@ export default function ElectionDetails({
                     onChange={formik.handleChange}
                   />
                   {formik.values.avatar && (
-                      <Image
+                    <Image
                       ml={2}
                       w={10}
                       h={10}
