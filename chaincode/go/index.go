@@ -242,6 +242,7 @@ func (t *VotingChaincode) voteV2(stub shim.ChaincodeStubInterface, args []string
 
 	// if voter does not exist, create new voter using voterV2 model
 	if voterAsBytes == nil {
+		fmt.Println("Creating new voter")
 		electionEligibility := ElectionEligibility{ElectionID: ElectionID, HasVoted: true}
 		var newVoter = voterV2{ID: VoterID, ElectionEligibility: []ElectionEligibility{electionEligibility}}
 		newVoterAsBytes, _ := json.Marshal(newVoter)
@@ -260,9 +261,11 @@ func (t *VotingChaincode) voteV2(stub shim.ChaincodeStubInterface, args []string
 		// if voter exists, update the voter election id
 		voter := voterV2{}
 		json.Unmarshal(voterAsBytes, &voter)
+		fmt.Println("Voter exists" + voter.ID)
 
 		// check if election id already exist in voter election eligibility
 		for i := 0; i < len(voter.ElectionEligibility); i++ {
+			fmt.Println("Target election id: " + ElectionID + " Voter election id: " + voter.ElectionEligibility[i].ElectionID)
 			if voter.ElectionEligibility[i].ElectionID == ElectionID && voter.ElectionEligibility[i].HasVoted {
 				return shim.Error("Voter has already voted for this election")
 			} else {
@@ -391,7 +394,13 @@ func (t *VotingChaincode) createCandidate(stub shim.ChaincodeStubInterface, args
 	} else {
 		// else create candidate
 		info := electionInfo{ElectionID: electionId, Votes: 0}
-		candidate := candidate{StudentID: studentId, Name: candidateName, Faculty: faculty, Party: party, Avatar: avatar, Elections: []electionInfo{info}}
+		candidate := candidate{
+			StudentID: studentId,
+			Name:      candidateName,
+			Faculty:   faculty,
+			Party:     party,
+			Avatar:    avatar,
+			Elections: []electionInfo{info}}
 		candidateAsBytes, _ := json.Marshal(candidate)
 		err := stub.PutState(studentId, candidateAsBytes)
 		if err != nil {

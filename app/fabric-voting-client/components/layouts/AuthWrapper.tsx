@@ -9,10 +9,19 @@ export default function AuthWrapper({ children }: { children: ReactNode }) {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
 
-  if (!user) {
+  // get current route
+  const route = router.pathname;
+  console.log("route", route);
+
+  // if (route.includes("/election/result")) return <>{children}</>;
+  if (route.includes("/election")) return <>{children}</>;
+
+
+  if (!user && !["/election/result"].includes(route)) {
     router.push("/api/auth/login");
     return <div>Loading...</div>;
   }
+  // check for public routes
   
   return <>{children}</>;
 }
