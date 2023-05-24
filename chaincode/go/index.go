@@ -256,7 +256,6 @@ func (t *VotingChaincode) voteV2(stub shim.ChaincodeStubInterface, args []string
 			fmt.Println("Error creating voter")
 			return shim.Error(err.Error())
 		}
-
 	} else {
 		// if voter exists, update the voter election id
 		voter := voterV2{}
