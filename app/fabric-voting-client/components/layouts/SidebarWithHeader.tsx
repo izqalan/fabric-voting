@@ -32,6 +32,7 @@ import {
 } from 'react-icons/fi';
 import { IconType } from 'react-icons';
 import { useRouter } from 'next/router'
+import { useUser } from '@auth0/nextjs-auth0/client'
 
 interface LinkItemProps {
   name: string;
@@ -47,6 +48,8 @@ export default function SidebarWithHeader({
   linkItems: Array<LinkItemProps>;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { user } = useUser();
+
   return (
     <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.800')} textColor={useColorModeValue('gray.700', 'inherit')}>
       <SidebarContent
@@ -67,7 +70,7 @@ export default function SidebarWithHeader({
         </DrawerContent>
       </Drawer>
       {/* mobilenav */}
-      <MobileNav onOpen={onOpen} />
+      <MobileNav onOpen={onOpen} avatar={user?.picture ?? `https://ui-avatars.com/api/?name=${user?.name}`} />
       <Box ml={{ base: 0, md: 60 }} p="4">
         {children}
       </Box>
@@ -144,9 +147,10 @@ const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
   );
 };
 interface MobileProps extends FlexProps {
+  avatar: string;
   onOpen: () => void;
 }
-const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
+const MobileNav = ({ avatar, onOpen, ...rest }: MobileProps) => {
   const { colorMode, toggleColorMode } = useColorMode()
 
   return (
@@ -203,9 +207,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               <HStack>
                 <Avatar
                   size={'sm'}
-                  src={
-                    'https://images.unsplash.com/photo-1619946794135-5bc917a27793?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
-                  }
+                  src={avatar}
                 />
                 <VStack
                   display={{ base: 'none', md: 'flex' }}
@@ -225,9 +227,6 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
             <MenuList
               bg={useColorModeValue('white', 'gray.900')}
               borderColor={useColorModeValue('gray.200', 'gray.700')}>
-              <MenuItem>Profile</MenuItem>
-              <MenuItem>Settings</MenuItem>
-              <MenuItem>Billing</MenuItem>
               <MenuDivider />
               <MenuItem onClick={
                 () => {
