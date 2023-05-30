@@ -54,7 +54,7 @@ Once the components are up and running, you can access the client application in
 
 ## Contributing
 
-Contributions are welcome! If you find any issues or would like to add new features, please open an issue or submit a pull request.
+No. Just no.
 
 ## Acknowledgments
 
