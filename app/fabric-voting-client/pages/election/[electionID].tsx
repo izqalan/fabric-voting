@@ -110,8 +110,8 @@ export default function Election() {
               {electionInfo.data.electionName}
             </Text>
             <Text>
-              Election ends in:{" "}
-              {new Date() > electionInfo.data.endDate ? "Ended" : "Ends"}{" "}
+              Election 
+              {new Date() > new Date(electionInfo.data.endDate) ? " ended" : " ends"}{" "}
               {formatDistance(new Date(electionInfo.data.endDate), new Date(), {
                 addSuffix: true,
               })}
@@ -119,7 +119,7 @@ export default function Election() {
           </Flex>
         )}
 
-        {!isEmpty(electionCandidates) && (
+        {!isEmpty(electionCandidates) && new Date() < new Date(electionInfo.data.endDate) && (
           <Flex direction={"row"} overflow={'scroll'} overflowWrap={'normal'}>
             {electionCandidates.map((candidate: any) => {
               const radio = getRadioProps({ value: candidate.Key });
@@ -149,13 +149,15 @@ export default function Election() {
         )}
       </Container>
 
-      <Container>
+      {!isEmpty(electionCandidates) && new Date() < new Date(electionInfo.data.endDate) && (
+        <Container>
         <Flex direction={"column"}>
           <Input onChange={(e) => setEmail(e.target.value)} my={2} required variant="outline" placeholder="siswa email" type="email"/>
           <Input onChange={(e) => setPassword(e.target.value)} my={2} required variant="outline" placeholder="password" type="password"/>
           <Button onClick={() => castVote(email, password, candidateId, electionInfo.data.electionID)} my={2}>Cast vote</Button>
         </Flex>
       </Container>
+      )}
     </Flex>
   );
 }
