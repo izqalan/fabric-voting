@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/hyperledger/fabric-chaincode-go/shim"
@@ -231,13 +230,13 @@ func (t *VotingChaincode) voteV2(stub shim.ChaincodeStubInterface, args []string
 	if err != nil {
 		return shim.Error("Failed to get election: " + ElectionID)
 	}
-	// parse election end date
-	electionEndDate, err := strconv.ParseInt(election.EndDate, 10, 64)
+	// parse election end date to datetime
+	electionEndDate, err := time.Parse(time.RFC3339, election.EndDate)
 	if err != nil {
-		return shim.Error("Failed to parse election end date: " + ElectionID)
+		return shim.Error("Failed to parse election end date: " + election.EndDate)
 	}
-	// check if end date has passed
-	if time.Now().Unix() > electionEndDate {
+	// check if election has ended
+	if time.Now().After(electionEndDate) {
 		return shim.Error("Election has ended")
 	}
 
