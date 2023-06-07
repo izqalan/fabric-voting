@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
@@ -220,6 +221,16 @@ func (t *VotingChaincode) voteV2(stub shim.ChaincodeStubInterface, args []string
 	voterAsBytes, err := stub.GetState(VoterID)
 	if err != nil {
 		return shim.Error("Failed to get voter: " + VoterID)
+	}
+
+	// get election
+	electionAsBytes, err := stub.GetState(ElectionID)
+	if err != nil {
+		return shim.Error("Failed to get election: " + ElectionID)
+	}
+	// check if end date has passed
+	if (electionAsBytes.EndDate - time.Now().Unix()) < 0 {
+		return shim.Error("Election has ended")
 	}
 
 	// update candidate votes
