@@ -54,7 +54,7 @@ export default function Election() {
   const toast = useToast();
 
   const castVote = async (email: string, password: string, candidateId: string, electionId: string) => {
-    const apiV2 = new Api("http://localhost:8081/api/v2");
+    const apiV2 = new Api(process.env.NEXT_PUBLIC_API_URL + "/api/v2");
     const payload = {
       email: email,
       password: password,

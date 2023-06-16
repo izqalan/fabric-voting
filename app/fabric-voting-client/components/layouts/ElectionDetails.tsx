@@ -71,8 +71,7 @@ export default function ElectionDetails({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const api = new Api();
   const btnRef = useRef();
-  // this is just a mock data
-  const BASE_URL = "http://localhost:3000";
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
   const [candidates, setCandidates] = useState<any[]>([]);
   const [registeredCandidates, setRegisteredCandidates] = useState<any[]>([]);
   const toast = useToast();

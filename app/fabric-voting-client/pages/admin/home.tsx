@@ -4,7 +4,7 @@ import { Text } from "@chakra-ui/react"
 
 export default function Home() {
 
-  const api = new Api('http://localhost:8081/api/v1');
+  const api = new Api(process.env.NEXT_PUBLIC_API_URL + '/api/v1');
   const [Hello, setHello] = useState({
     message: 'Nil'
   })
@@ -19,7 +19,7 @@ export default function Home() {
 
   return (
     <>
-      {Hello && (<Text>{Hello.message}</Text>)}
+      {Hello && (<Text>{process.env.NEXT_PUBLIC_API_URL}</Text>)}
     </>
   )
 }

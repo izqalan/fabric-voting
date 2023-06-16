@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -11,7 +12,20 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg/v10"
 	"github.com/hyperledger/fabric-gateway/pkg/client"
+	"github.com/joho/godotenv"
 )
+
+func goDotEnvVariable(key string) string {
+
+	// load .env file
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
+
+	return os.Getenv(key)
+}
 
 type newElectionValue struct {
 	Target string `json:"target"`
@@ -476,13 +490,23 @@ func castVoteV2(contract *client.Contract, c *gin.Context) {
 		return
 	}
 
+	doServer := goDotEnvVariable("DB_STRING")
+
+	opt, err := pg.ParseURL(doServer)
+
+	if err != nil {
+		panic(err)
+	}
+
+	db := pg.Connect(opt)
+
 	// connect pgsql
-	db := pg.Connect(&pg.Options{
-		Addr:     ":5432",
-		User:     "postgres",
-		Password: "admin",
-		Database: "fabric-voting-users",
-	})
+	// db := pg.Connect(&pg.Options{
+	// 	Addr:     ":5432",
+	// 	User:     "postgres",
+	// 	Password: "admin",
+	// 	Database: "fabric-voting-users",
+	// })
 
 	// if connection fails
 	if db == nil {
@@ -500,7 +524,7 @@ func castVoteV2(contract *client.Contract, c *gin.Context) {
 
 	// unsalt password using pgcrypto
 	var u user
-	err := db.Model(&u).
+	err = db.Model(&u).
 		Where("email = ?", voteV2.Email).
 		Where("password = crypt(?, password)", voteV2.Password).
 		Select()
@@ -508,7 +532,7 @@ func castVoteV2(contract *client.Contract, c *gin.Context) {
 	if err != nil {
 		// return error message wrong email or password
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error":  "Wrong email or password.",
+			"error":  err.Error(),
 			"status": http.StatusBadRequest,
 		})
 		return

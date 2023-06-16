@@ -1,7 +1,7 @@
 // make rest api requests
 
 export default class Api {
-  url = 'http://localhost:8081/api/v1';
+  url = process.env.NEXT_PUBLIC_API_URL + '/api/v1';
 
   //constructor that takes in a url, url is optional
   constructor(url?: string) {
