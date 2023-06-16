@@ -80,7 +80,7 @@ func main() {
 
 	// Swagger Endpoints
 	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	r.Run(":8081")
+	r.Run(":80")
 }
 
 // newGrpcConnection creates a gRPC connection to the Gateway server.
