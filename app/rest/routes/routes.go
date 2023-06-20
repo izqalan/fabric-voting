@@ -69,6 +69,11 @@ type voteV2 struct {
 	ElectionID  string `json:"electionID"`
 }
 
+type Response struct {
+	Message string `json:"message"`
+	Status  int    `json:"status"`
+}
+
 func SetupRouter(contract *client.Contract) *gin.Engine {
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
@@ -82,8 +87,10 @@ func SetupRouter(contract *client.Contract) *gin.Engine {
 
 	// Create a buffered channel to queue incoming requests
 	requestQueue := make(chan *gin.Context, 100)
-	// Create a WaitGroup to synchronize goroutines
+	// Create a WaitGroup to track the number of active requests
 	var wg sync.WaitGroup
+
+	var mutex sync.Mutex
 
 	go func() {
 		for ctx := range requestQueue {
@@ -91,10 +98,8 @@ func SetupRouter(contract *client.Contract) *gin.Engine {
 			wg.Add(1)
 
 			// Process the request
-			castVoteV2(contract, ctx)
+			go castVoteV2(contract, ctx, &wg, &mutex)
 
-			// Decrement the WaitGroup counter
-			wg.Done()
 		}
 	}()
 
@@ -137,10 +142,21 @@ func SetupRouter(contract *client.Contract) *gin.Engine {
 	v2 := r.Group("/api/v2")
 	{
 		v2.POST("/ballot/vote", func(c *gin.Context) {
+			// Create a channel to receive the response
+			responseChan := make(chan *Response)
+
+			c.Set("responseChan", responseChan)
+			// Add the request and response channel to the queue
 			requestQueue <- c
 
-			// Wait for the request to finish processing
-			wg.Wait()
+			// Wait for the response from the goroutine processing the request
+			response := <-responseChan
+
+			// Send the response back to the client
+			c.JSON(response.Status, gin.H{
+				"message": response.Message,
+				"status":  response.Status,
+			})
 
 		})
 	}
@@ -217,8 +233,6 @@ func getAllCandidates(contract *client.Contract, c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		panic(fmt.Errorf("failed to evaluate transaction: %w", err))
 	}
-
-	fmt.Printf("*** Transaction result: %s\n", string(result))
 
 	var response interface{}
 	err = json.Unmarshal(result, &response)
@@ -505,7 +519,11 @@ func castVote(contract *client.Contract, c *gin.Context) {
 // @Produce  json
 // @Body  {object} voterEmail, password, candidateID, ElectionID
 // @Success 200 {string} string "Vote casted"
-func castVoteV2(contract *client.Contract, c *gin.Context) {
+func castVoteV2(contract *client.Contract, c *gin.Context, wg *sync.WaitGroup, mutex *sync.Mutex) {
+	defer wg.Done()
+
+	mutex.Lock()
+	defer mutex.Unlock()
 
 	var voteV2 voteV2
 	if err := c.ShouldBindJSON(&voteV2); err != nil {
@@ -552,12 +570,28 @@ func castVoteV2(contract *client.Contract, c *gin.Context) {
 		Where("password = crypt(?, password)", voteV2.Password).
 		Select()
 
+	responseChan, ok := c.Get("responseChan")
+	if !ok {
+		// If the response channel is not found, log an error and return
+		fmt.Println("Response channel not found in context")
+		response := &Response{
+			Message: "Response channel not found in context",
+			Status:  http.StatusInternalServerError,
+		}
+
+		// Send the response back through the channel
+		responseChan.(chan *Response) <- response
+	}
+
 	if err != nil {
 		// return error message wrong email or password
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":  err.Error(),
-			"status": http.StatusBadRequest,
-		})
+		response := &Response{
+			Message: "Wrong email or password",
+			Status:  http.StatusBadRequest,
+		}
+
+		// Send the response back through the channel
+		responseChan.(chan *Response) <- response
 		return
 	}
 
@@ -569,15 +603,33 @@ func castVoteV2(contract *client.Contract, c *gin.Context) {
 	_, err = contract.SubmitTransaction("voteV2", userID, voteV2.CandidateID, voteV2.ElectionID)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		panic(fmt.Errorf("failed to submit transaction: %w", err))
+		response := &Response{
+			Message: err.Error(),
+			Status:  http.StatusBadRequest,
+		}
+
+		responseChan, ok := c.Get("responseChan")
+		if !ok {
+			// If the response channel is not found, log an error and return
+			fmt.Println("Response channel not found in context")
+			response = &Response{
+				Message: "Response channel not found in context",
+				Status:  http.StatusInternalServerError,
+			}
+		}
+
+		// Send the response back through the channel
+		responseChan.(chan *Response) <- response
 	}
 
 	fmt.Printf("*** Transaction committed successfully\n")
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Vote casted. Txn committed successfully.",
-		"status":  http.StatusOK,
-	})
+	response := &Response{
+		Message: "Vote casted. Txn committed successfully.",
+		Status:  http.StatusOK,
+	}
+
+	// Send the response back through the channel
+	responseChan.(chan *Response) <- response
 
 }
