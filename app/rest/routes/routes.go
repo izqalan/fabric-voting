@@ -538,6 +538,7 @@ func castVoteV2(contract *client.Contract, c *gin.Context) {
 		return
 	}
 
+	// get user id from PG
 	userID := strconv.Itoa(u.Id)
 	fmt.Println(voteV2.CandidateID, voteV2.ElectionID, userID)
 

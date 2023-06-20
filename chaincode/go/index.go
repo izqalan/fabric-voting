@@ -223,6 +223,20 @@ func (t *VotingChaincode) voteV2(stub shim.ChaincodeStubInterface, args []string
 		return shim.Error("Failed to get voter: " + VoterID)
 	}
 
+	// if voter exists, check if election id exist
+	if voterAsBytes != nil {
+		voter := voterV2{}
+		json.Unmarshal(voterAsBytes, &voter)
+
+		// if election id exist, return error
+		for i := 0; i < len(voter.ElectionEligibility); i++ {
+			if voter.ElectionEligibility[i].ElectionID == ElectionID && voter.ElectionEligibility[i].HasVoted {
+				fmt.Printf("Voter has already voted for this election")
+				return shim.Error("Voter has already voted")
+			}
+		}
+	}
+
 	// get election
 	electionAsBytes, err := stub.GetState(ElectionID)
 	election := election{}
@@ -256,54 +270,26 @@ func (t *VotingChaincode) voteV2(stub shim.ChaincodeStubInterface, args []string
 	}
 	candidate.Elections = contestedElection
 	candidateAsBytes, _ = json.Marshal(candidate)
+	stub.PutState(CandidateID, candidateAsBytes)
 	// candidate votes ledger updated when
 
-	// if voter does not exist, create new voter using voterV2 model
+	electionEligibility := ElectionEligibility{ElectionID: ElectionID, HasVoted: true}
+	// update voter ledger
+	// if voter does not exist, create new voter
 	if voterAsBytes == nil {
-		fmt.Println("Creating new voter")
-		electionEligibility := ElectionEligibility{ElectionID: ElectionID, HasVoted: true}
-		var newVoter = voterV2{ID: VoterID, ElectionEligibility: []ElectionEligibility{electionEligibility}}
-		newVoterAsBytes, _ := json.Marshal(newVoter)
-		err = stub.PutState(CandidateID, candidateAsBytes)
-		if err != nil {
-			fmt.Println("Error creating candidate")
-			return shim.Error(err.Error())
-		}
-		err = stub.PutState(VoterID, newVoterAsBytes)
-		if err != nil {
-			fmt.Println("Error creating voter")
-			return shim.Error(err.Error())
-		}
+		voter := voterV2{}
+		voter.ID = Id
+		voter.ElectionEligibility = append(voter.ElectionEligibility, electionEligibility)
+		voterAsBytes, _ = json.Marshal(voter)
+		stub.PutState(VoterID, voterAsBytes)
 	} else {
-		// if voter exists, update the voter election id
+		// if voter exist, update voter
 		voter := voterV2{}
 		json.Unmarshal(voterAsBytes, &voter)
-		fmt.Println("Voter exists" + voter.ID)
-
-		// check if election id already exist in voter election eligibility
-		for i := 0; i < len(voter.ElectionEligibility); i++ {
-			fmt.Println("Target election id: " + ElectionID + " Voter election id: " + voter.ElectionEligibility[i].ElectionID)
-			if voter.ElectionEligibility[i].ElectionID == ElectionID && voter.ElectionEligibility[i].HasVoted {
-				return shim.Error("Voter has already voted for this election")
-			} else {
-				voter.ElectionEligibility[i].HasVoted = true
-			}
-		}
-
+		voter.ElectionEligibility = append(voter.ElectionEligibility, electionEligibility)
 		voterAsBytes, _ = json.Marshal(voter)
-		err = stub.PutState(CandidateID, candidateAsBytes)
-		if err != nil {
-			fmt.Println("Error updating candidate")
-			return shim.Error(err.Error())
-		}
-		err = stub.PutState(VoterID, voterAsBytes)
-		if err != nil {
-			fmt.Println("Error updating voter")
-			return shim.Error(err.Error())
-		}
-
+		stub.PutState(VoterID, voterAsBytes)
 	}
-
 	return shim.Success(nil)
 }
 
