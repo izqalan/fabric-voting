@@ -1,9 +1,10 @@
 # A DLT Based Voting system using Hyperledger Fabric
 
-![archi design](https://github.com/izqalan/fabric-voting/assets/24191952/86124ba7-25fc-4508-a1a9-f7276126907a)
-
+![implementasi-archi VPC](https://github.com/izqalan/fabric-voting/assets/24191952/207fc0e9-cd8d-4d7c-910c-b9fa13ba83f6)
 
 This project combines the power of Hyperledger Fabric, Golang, Gin-gonic, and Next.js to create a blockchain application with a REST API and a client-side user interface. By leveraging these technologies, you can build a secure and decentralized system that allows for transparent and auditable transactions.
+
+*The network and REST API is hosted in the same VPC because I'm broke.
 
 ## Project Overview
 
