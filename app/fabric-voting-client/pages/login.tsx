@@ -27,7 +27,7 @@ export default function Login() {
           <Stack spacing={{ base: '2', md: '3' }} textAlign="center">
             <Heading size={{ base: 'xs', md: 'sm' }} color={useColorModeValue("black", "white")}>Log in to your account</Heading>
             <HStack spacing="1" justify="center">
-              <Text color="gray.500">Privacy is not a privilege, it's a right. Protect your vote, protect democracy.</Text>
+              <Text color="gray.500">Privacy is not a privilege, it&apos;s a right. Protect your vote, protect democracy.</Text>
             </HStack>
           </Stack>
         </Stack>

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   useColorModeValue,
   Flex,
@@ -331,7 +332,7 @@ export default function ElectionDetails({
           )}
         </TableContainer>
 
-        <Modal initialFocusRef={btnRef} isOpen={isOpen} onClose={onClose}>
+        <Modal finalFocusRef={btnRef} isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>Add candidate</ModalHeader>

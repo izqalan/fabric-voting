@@ -331,7 +331,7 @@ func getAllElections(contract *client.Contract, c *gin.Context) {
 		panic(fmt.Errorf("failed to query transaction: %w", err))
 	}
 
-	fmt.Printf("*** Transaction result: %s\n", string(result))
+	fmt.Printf("*** Elections fetched successfully\n")
 
 	var response interface{}
 	err = json.Unmarshal(result, &response)

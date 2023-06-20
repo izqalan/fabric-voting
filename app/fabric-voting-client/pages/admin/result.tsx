@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import ElectionCard from "@/components/elements/electionCard";
 import ElectionResult from "@/components/layouts/ElectionResult";

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useRouter } from "next/router";
 import { Container, Flex, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";

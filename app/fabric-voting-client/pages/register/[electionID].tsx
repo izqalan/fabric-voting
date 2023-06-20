@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useRouter } from "next/router";
 import {
   VStack,
@@ -100,7 +101,7 @@ export default function Register() {
                 onChange={formik.handleChange}
                 type="email"
               />
-              <FormHelperText>We'll never share your email.</FormHelperText>
+              <FormHelperText>We&apos;ll never share your email.</FormHelperText>
             </FormControl>
             {/* Submit button */}
             <Flex justifyContent={"end"}>

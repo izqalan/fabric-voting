@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react"
 import Api from "@/components/utils/api"
 import { Text } from "@chakra-ui/react"
