@@ -620,6 +620,7 @@ func castVoteV2(contract *client.Contract, c *gin.Context, wg *sync.WaitGroup, m
 
 		// Send the response back through the channel
 		responseChan.(chan *Response) <- response
+		return
 	}
 
 	fmt.Printf("*** Transaction committed successfully\n")
