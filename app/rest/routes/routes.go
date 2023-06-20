@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -79,6 +80,24 @@ func SetupRouter(contract *client.Contract) *gin.Engine {
 		MaxAge:           12 * time.Hour,
 	}))
 
+	// Create a buffered channel to queue incoming requests
+	requestQueue := make(chan *gin.Context, 100)
+	// Create a WaitGroup to synchronize goroutines
+	var wg sync.WaitGroup
+
+	go func() {
+		for ctx := range requestQueue {
+			// Increment the WaitGroup counter
+			wg.Add(1)
+
+			// Process the request
+			castVoteV2(contract, ctx)
+
+			// Decrement the WaitGroup counter
+			wg.Done()
+		}
+	}()
+
 	v1 := r.Group("/api/v1")
 	{
 		v1.GET("/ping", pong)
@@ -118,7 +137,11 @@ func SetupRouter(contract *client.Contract) *gin.Engine {
 	v2 := r.Group("/api/v2")
 	{
 		v2.POST("/ballot/vote", func(c *gin.Context) {
-			castVoteV2(contract, c)
+			requestQueue <- c
+
+			// Wait for the request to finish processing
+			wg.Wait()
+
 		})
 	}
 	return r
