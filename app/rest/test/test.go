@@ -7,9 +7,12 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 type ElectionRequest struct {
@@ -36,10 +39,11 @@ type VoteRequest struct {
 
 func main() {
 	// Configuration
-	concurrentRequests := 20                            // Total number of requests to be sent
-	apiURL := "http://localhost/api/v2/ballot/vote"     // URL of the voting API endpoint
-	electionURL := "http://localhost/api/v1/election"   // URL of the election API endpoint
-	candidateURL := "http://localhost/api/v1/candidate" // URL of the candidate API endpoint
+	concurrentRequests := 20 // Total number of requests to be sent
+	TEST_URL := goDotEnvVariable("TEST_URL")
+	apiURL := TEST_URL + "/api/v2/ballot/vote"     // URL of the voting API endpoint
+	electionURL := TEST_URL + "/api/v1/election"   // URL of the election API endpoint
+	candidateURL := TEST_URL + "/api/v1/candidate" // URL of the candidate API endpoint
 	AVATAR_URL := "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1061&q=80"
 
 	// Create an election
@@ -210,4 +214,16 @@ func calculateAverage(times <-chan time.Duration) time.Duration {
 	}
 
 	return 0
+}
+
+func goDotEnvVariable(key string) string {
+
+	// load .env file
+	err := godotenv.Load("../.env")
+
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
+
+	return os.Getenv(key)
 }

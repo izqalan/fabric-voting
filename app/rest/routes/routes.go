@@ -89,17 +89,13 @@ func SetupRouter(contract *client.Contract) *gin.Engine {
 	requestQueue := make(chan *gin.Context, 100)
 	// Create a WaitGroup to track the number of active requests
 	var wg sync.WaitGroup
-
 	var mutex sync.Mutex
-
 	go func() {
 		for ctx := range requestQueue {
 			// Increment the WaitGroup counter
 			wg.Add(1)
-
 			// Process the request
 			go castVoteV2(contract, ctx, &wg, &mutex)
-
 		}
 	}()
 
@@ -523,6 +519,7 @@ func castVoteV2(contract *client.Contract, c *gin.Context, wg *sync.WaitGroup, m
 	defer wg.Done()
 
 	mutex.Lock()
+	// unlock at the end of the function
 	defer mutex.Unlock()
 
 	var voteV2 voteV2
