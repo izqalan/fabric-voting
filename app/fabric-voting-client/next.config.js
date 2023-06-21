@@ -4,7 +4,7 @@ const nextConfig = {
   rewrites: async () => [
     {
       source: '/admin',
-      destination: '/admin/home',
+      destination: '/admin/election',
     },
   ],
 }

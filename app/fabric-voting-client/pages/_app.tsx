@@ -12,7 +12,6 @@ export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
   const LinkItems = [
-    { name: "Home", icon: FiHome, route: "/admin/home" },
     { name: "Pilihan raya", icon: FiTrendingUp, route: "/admin/election" },
     { name: "Keputusan", icon: FiBarChart, route: "/admin/result" },
   ];
@@ -26,7 +25,7 @@ export default function App({ Component, pageProps }: AppProps) {
               <Component {...pageProps} />
             </SidebarWithHeader>
           )}
-          <Component {...pageProps} />
+          {!router.pathname.includes("admin") && <Component {...pageProps} />}
         </AuthWrapper>
       </ChakraProvider>
     </UserProvider>

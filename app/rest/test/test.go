@@ -37,9 +37,14 @@ type VoteRequest struct {
 	CandidateID string `json:"candidateID"`
 }
 
+type EndElectionRequest struct {
+	Target string `json:"target"`
+	Value  string `json:"value"`
+}
+
 func main() {
 	// Configuration
-	concurrentRequests := 20 // Total number of requests to be sent
+	concurrentRequests := 50 // Total number of requests to be sent
 	TEST_URL := goDotEnvVariable("TEST_URL")
 	apiURL := TEST_URL + "/api/v2/ballot/vote"     // URL of the voting API endpoint
 	electionURL := TEST_URL + "/api/v1/election"   // URL of the election API endpoint
@@ -184,6 +189,38 @@ func main() {
 	// Calculate total duration
 	totalDuration := time.Since(startTime)
 	averageResponseTime := calculateAverage(responseTimes)
+
+	endElectionUrl := TEST_URL + "/api/v1/election/" + electionID
+
+	// End the election
+	// Create a new PUT request for ending the election
+	endElectionReq := EndElectionRequest{
+		Target: "endDate",
+		Value:  time.Now().UTC().Format(time.RFC3339),
+	}
+
+	requestBody, err = json.Marshal(endElectionReq)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	fmt.Printf("Ending election...")
+	req, err := http.NewRequest(http.MethodPut, endElectionUrl, bytes.NewReader(requestBody))
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	defer req.Body.Close()
+
+	_, err = io.Copy(ioutil.Discard, req.Body)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	fmt.Println("Election ended successfully")
+	fmt.Println("Result at /election/result/" + electionID)
 
 	// Print results
 	fmt.Printf("Load test completed in %s\n", totalDuration)
