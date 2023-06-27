@@ -71,7 +71,7 @@ export default function ElectionDetails({
 }: ElectionDetailsProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const api = new Api();
-  const btnRef = useRef();
+  const btnRef = useRef<HTMLInputElement>(null);
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
   const [candidates, setCandidates] = useState<any[]>([]);
   const [registeredCandidates, setRegisteredCandidates] = useState<any[]>([]);

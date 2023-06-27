@@ -22,7 +22,7 @@ export default function Election() {
   // Get electionID from URL
   const router = useRouter();
   const { electionID } = router.query;
-  const [electionInfo, setElectionInfo] = useState({});
+  const [electionInfo, setElectionInfo] = useState({} as any);
   const [electionCandidates, setElectionCandidates] = useState([]);
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")

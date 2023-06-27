@@ -23,7 +23,7 @@ import Api from "../utils/api";
 
 interface ElectionResultProps {
   electionName: string;
-  electionID: string;
+  electionID: string | string[] | undefined;
   startDate: Date;
   endDate: Date;
   createdAt: Date;

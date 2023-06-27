@@ -1,11 +1,11 @@
 import React, { HTMLAttributes } from "react";
-import ReactDatePicker from "react-datepicker";
+import ReactDatePicker, { ReactDatePickerProps } from "react-datepicker";
 import { useColorMode } from "@chakra-ui/react";
 
-interface Props {
+interface Props extends ReactDatePickerProps{
   isClearable?: boolean;
   onChange: (date: Date) => any;
-  selectedDate: Date | undefined;
+  selectedDate: Date | any;
   showPopperArrow?: boolean;
   name?: string;
 }
@@ -31,7 +31,6 @@ const DatePicker = ({
         isClearable={isClearable}
         showPopperArrow={showPopperArrow}
         className="react-datapicker__input-text" //input is white by default and there is no already defined class for it so I created a new one
-        {...props}
       />
     </div>
   );

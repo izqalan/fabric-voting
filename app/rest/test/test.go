@@ -44,7 +44,7 @@ type EndElectionRequest struct {
 
 func main() {
 	// Configuration
-	concurrentRequests := 50 // Total number of requests to be sent
+	concurrentRequests := 1000 // Total number of requests to be sent
 	TEST_URL := goDotEnvVariable("TEST_URL")
 	apiURL := TEST_URL + "/api/v2/ballot/vote"     // URL of the voting API endpoint
 	electionURL := TEST_URL + "/api/v1/election"   // URL of the election API endpoint

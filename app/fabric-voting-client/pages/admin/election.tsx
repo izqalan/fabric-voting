@@ -154,8 +154,8 @@ export default function Election() {
                 <DatePicker
                   id="startDate"
                   name="startDate"
-                  selected={startDate}
-                  onChange={(date) => setStartDate(date)}
+                  selectedDate={startDate}
+                  onChange={(date : any) => setStartDate(date)}
                   showTimeSelect
                   dateFormat="dd/MM/yyyy h:mm aa"
                   minDate={new Date()}
@@ -168,8 +168,8 @@ export default function Election() {
                 <DatePicker
                   id="endDate"
                   name="endDate"
-                  selected={endDate}
-                  onChange={(date) => setEndDate(date)}
+                  selectedDate={endDate}
+                  onChange={(date : any) => setEndDate(date)}
                   showTimeSelect
                   dateFormat="dd/MM/yyyy h:mm aa"
                   minDate={startDate}
