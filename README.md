@@ -38,6 +38,7 @@ AUTH0_BASE_URL='http://localhost:3000'
 AUTH0_ISSUER_BASE_URL='https://xxx.auth0.com'
 AUTH0_CLIENT_ID='xxxx'
 AUTH0_CLIENT_SECRET='xxxx_xxx-xxxx'
+DB_STRING=postgresql://user:secret@localhost
 ```
 
 6. Launch the Next.js client application. cd to `/app/fabric-voting-client` then `yarn dev`
@@ -56,6 +57,9 @@ Once the components are up and running, you can access the client application in
 ## Contributing
 
 No. Just no.
+
+## Testing
+Functional testing is done using Postman and load testing script can be found at [app/rest/test/test.go](https://github.com/izqalan/fabric-voting/tree/master/app/rest/test)
 
 ## Acknowledgments
 
