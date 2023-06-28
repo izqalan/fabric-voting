@@ -52,6 +52,17 @@ export default function Election() {
     fetchElectionInfo();
   }, [electionID]);
 
+  // redirect to relection result page if election has ended
+  useEffect(() => {
+    if (!isEmpty(electionInfo)) {
+      const endDate = new Date(electionInfo.data.endDate);
+      const now = new Date();
+      if (endDate < now) {
+        router.push(`/election/result/${electionID}`);
+      }
+    }
+  }, [electionInfo]);
+
   const toast = useToast();
 
   const castVote = async (email: string, password: string, candidateId: string, electionId: string) => {

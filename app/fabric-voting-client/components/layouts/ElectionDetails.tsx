@@ -230,9 +230,9 @@ export default function ElectionDetails({
             <Text color="gray.500" fontSize="sm">
               {format(startDate, "PPppp")} ~ {format(endDate, "PPppp")}
             </Text>
-            <Text color="gray.500" fontSize="sm">
+            {/* <Text color="gray.500" fontSize="sm">
               Last updated at {format(updatedAt, "PPpp")}
-            </Text>
+            </Text> */}
           </Flex>
           <VStack alignItems={"end"}>
             <Menu>
