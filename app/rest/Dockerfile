@@ -1,2 +1,4 @@
 FROM golang:latest
-CMD ["go run main.go"]
+RUN go build -o main .
+
+CMD ["./main"]
