@@ -51,6 +51,7 @@ func main() {
 	candidateURL := TEST_URL + "/api/v1/candidate" // URL of the candidate API endpoint
 	AVATAR_URL := "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1061&q=80"
 
+	numberOfFailedRequests := 0
 	// Create an election
 	// format start date and end date to RFC3339
 	startDate := time.Now().UTC().Format(time.RFC3339)
@@ -179,6 +180,11 @@ func main() {
 			responseTimes <- duration
 
 			fmt.Printf("Request: %s | Status Code: %d | Response time: %s\n", email, resp.StatusCode, duration)
+
+			if resp.StatusCode != 200 {
+				numberOfFailedRequests++
+			}
+
 		}(i)
 
 	}
@@ -188,7 +194,6 @@ func main() {
 
 	// Calculate total duration
 	totalDuration := time.Since(startTime)
-	averageResponseTime := calculateAverage(responseTimes)
 
 	endElectionUrl := TEST_URL + "/api/v1/election/" + electionID
 
@@ -224,7 +229,9 @@ func main() {
 
 	// Print results
 	fmt.Printf("Load test completed in %s\n", totalDuration)
-	fmt.Printf("Average response time: %s\n", averageResponseTime)
+	fmt.Printf("Total number of requests: %d\n", concurrentRequests)
+	fmt.Printf("Average response time per request: %s\n", totalDuration/time.Duration(concurrentRequests))
+	fmt.Printf("Number of failed requests: %d\n", numberOfFailedRequests)
 
 }
 
