@@ -1,7 +1,8 @@
 version: '3.7'
 
 services:
-  app:
+  services:
+    container_name: REST Service
     build:
       context: ../app
       dockerfile: Dockerfile
