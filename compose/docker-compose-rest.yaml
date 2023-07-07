@@ -3,7 +3,7 @@ version: '3.7'
 services:
   app:
     build:
-      context: ../fabric-voting
+      context: ./fabric-voting
       dockerfile: Dockerfile
     ports:
       - 80:80
