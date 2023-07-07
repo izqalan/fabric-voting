@@ -1,5 +1,5 @@
 FROM golang:latest
 
-WORKDIR /app/rest
+WORKDIR /rest
 
 CMD ["go run main.go"]
