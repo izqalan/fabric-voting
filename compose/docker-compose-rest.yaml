@@ -4,7 +4,7 @@ services:
   services:
     container_name: REST-Service
     build:
-      context: ../app/rest
+      context: ../
       dockerfile: Dockerfile
     ports:
       - 80:80
