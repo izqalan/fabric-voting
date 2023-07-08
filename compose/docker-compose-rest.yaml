@@ -5,6 +5,6 @@ services:
     container_name: REST-Service
     build:
       context: ../
-      dockerfile: Dockerfile
+      dockerfile: ./app/rest/Dockerfile
     ports:
       - 80:80
