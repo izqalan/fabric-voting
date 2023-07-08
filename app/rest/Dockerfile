@@ -1,12 +1,11 @@
 FROM golang:latest
+COPY /test-network /test-network
 
-RUN ls -la
+WORKDIR /app/rest
 
-WORKDIR /app/rest/
+COPY go.mod /app/rest
+COPY go.sum /app/rest
 
-# ls dir
-RUN ls -la
-
+WORKDIR /app/rest
 RUN go build -o main .
-
 CMD ["./main"]
