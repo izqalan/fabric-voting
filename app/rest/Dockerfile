@@ -1,6 +1,8 @@
 FROM golang:latest
 
-WORKDIR /app/rest
+RUN ls -la
+
+WORKDIR /app/rest/
 
 # ls dir
 RUN ls -la
