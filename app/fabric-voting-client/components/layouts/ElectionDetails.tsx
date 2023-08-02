@@ -117,7 +117,7 @@ export default function ElectionDetails({
           status: "success",
           isClosable: true,
         });
-        fetchCandidates();
+        fetchData();
       } else {
         // show error
         toast({
