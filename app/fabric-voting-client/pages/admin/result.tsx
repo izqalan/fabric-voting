@@ -23,7 +23,8 @@ export default function Result() {
     const fetchData = async () => {
       const res = await api.get("/election");
       if (res.status === 200) {
-        setActiveElections(res.data);
+        // reverse the array so that the latest election is on top
+        setActiveElections(res.data.reverse());
       }
     };
     fetchData();

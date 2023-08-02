@@ -40,14 +40,15 @@ export default function Election() {
   const [selectedElection, setSelectedElection] = useState<any>({});
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await api.get("/election");
-      if (res.status === 200) {
-        setActiveElections(res.data);
-      }
-    };
     fetchData();
   }, []);
+
+  const fetchData = async () => {
+    const res = await api.get("/election");
+    if (res.status === 200) {
+      setActiveElections(res.data);
+    }
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -68,6 +69,7 @@ export default function Election() {
           status: "success",
           isClosable: true,
         });
+        fetchData();
       } else {
         // show error
         toast({
