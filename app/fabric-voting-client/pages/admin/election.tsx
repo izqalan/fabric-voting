@@ -46,7 +46,7 @@ export default function Election() {
   const fetchData = async () => {
     const res = await api.get("/election");
     if (res.status === 200) {
-      setActiveElections(res.data);
+      setActiveElections(res.data.reverse());
     }
   };
 

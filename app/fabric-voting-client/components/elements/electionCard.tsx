@@ -3,6 +3,9 @@ import { formatDistance, format } from "date-fns";
 import { IconButton } from "@chakra-ui/react";
 import { FiClipboard } from "react-icons/fi";
 import copyMessage from "../utils/copyMessage";
+import { useEffect, useState } from "react";
+import Api from "../utils/api";
+import { isEmpty } from "lodash";
 
 interface ElectionCardProps {
   electionName: string;
@@ -28,16 +31,32 @@ export default function ElectionCard({
   style
 }: ElectionCardProps) {
 
-  const BASE_URL = "http://localhost:3000";
+  const api = new Api();
+  const [candidates, setCandidates] = useState<any[]>([]);
 
-  let candidates = [{
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
-  }, {
-    avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80"
-  }, {
-    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=761&q=80"
-  }
-  ]
+  const fetchData = async () => {
+    const res = await api.get(`/candidate/${electionID}`);
+    if (res.status === 200) {
+      setCandidates(res.data);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [electionID]);
+
+  console.log(candidates);
+
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
+  // let candidates = [{
+  //   avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
+  // }, {
+  //   avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80"
+  // }, {
+  //   avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=761&q=80"
+  // }
+  // ]
 
   return (
     <Box
@@ -135,7 +154,7 @@ export default function ElectionCard({
         {/**
          * TODO: update api and chaincode to include candidate avatar
          * */}
-        {candidates.map((candidate, index) => (
+        {!isEmpty(candidates) && candidates.map((candidate, index) => (
           <Image
             key={index}
             w={10}
@@ -152,7 +171,7 @@ export default function ElectionCard({
               base: "none",
               sm: "block",
             }}
-            src={candidate.avatar}
+            src={candidate.Record.avatar}
             alt="avatar"
             zIndex={candidates.length - index}
           />))

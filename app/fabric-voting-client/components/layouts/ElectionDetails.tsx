@@ -88,6 +88,9 @@ export default function ElectionDetails({
       setCandidates(res.data);
     }
   };
+
+  // get all registered candidates
+  // for the select dropdown
   const fetchCandidates = async () => {
     const res = await api.get(`/candidate`);
     if (res.status === 200) {
