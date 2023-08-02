@@ -78,22 +78,22 @@ export default function ElectionDetails({
   const toast = useToast();
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await api.get(`/candidate/${electionID}`);
-      console.log(res.data);
-      if (res.status === 200) {
-        setCandidates(res.data);
-      }
-    };
-    const fetchCandidates = async () => {
-      const res = await api.get(`/candidate`);
-      if (res.status === 200) {
-        setRegisteredCandidates(res.data);
-      }
-    };
     fetchData();
     fetchCandidates();
   }, [electionID]);
+
+  const fetchData = async () => {
+    const res = await api.get(`/candidate/${electionID}`);
+    if (res.status === 200) {
+      setCandidates(res.data);
+    }
+  };
+  const fetchCandidates = async () => {
+    const res = await api.get(`/candidate`);
+    if (res.status === 200) {
+      setRegisteredCandidates(res.data);
+    }
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -117,6 +117,7 @@ export default function ElectionDetails({
           status: "success",
           isClosable: true,
         });
+        fetchCandidates();
       } else {
         // show error
         toast({
